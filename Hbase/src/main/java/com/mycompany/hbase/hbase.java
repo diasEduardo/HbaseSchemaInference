@@ -60,7 +60,7 @@ public class hbase {
         String table = "pessoas";
         String family = "teste";//"dados";
         Configuration conf = HBaseConfiguration.create();
-        //typeTests(namespace, table, family, conf);
+        typeTests(namespace, table, family, conf);
         //dataTests(namespace, table, family, conf);
         //binaryTests(namespace, table, family, conf);
         //get_tables_and_families(namespace, conf);
@@ -98,6 +98,14 @@ public class hbase {
         long diff = TimeUnit.MILLISECONDS.toSeconds(diffInMillies);
         System.out.println("\nlen - " + str.length + "\nvalid - " + valid + "\ntime - " + diffInMillies);
          */
+        int a = 2139127936;
+        byte[] b = Bytes.toBytes(a);
+        byte test = (byte) (b[1] >> 1);
+        System.out.println(Bytes.toFloat(b));
+        long c = 9219133352956719344L;
+        byte[] d = Bytes.toBytes(c);
+        
+        System.out.println(Bytes.toDouble(d));
     }
 
     public static void scan_all(String table, Configuration conf) throws IOException {
@@ -414,10 +422,11 @@ public class hbase {
                             System.out.println(new String(value, "ISO-8859-1"));
                         }
                         
-                        
+                        if( (value[0] != -1 && value[0] != 127 ) || value[1] >= 0){
+                            System.out.println(Bytes.toFloat(value));
+                        }
 
                         System.out.println(Bytes.toInt(value));
-                        System.out.println(valueOf);
                         break;
                     case 5:
                     case 6:
@@ -429,6 +438,15 @@ public class hbase {
                         break;
                     case 8:
                         //double or long or string
+                        if (isUtf8Valid(value)) {
+                            System.out.println(Bytes.toString(value));
+                        }
+                        //01111111 11110000
+                        if( (value[0] != -1 && value[0] != 127 ) || (value[1] < -16 || value[1] > -1 )){
+                            System.out.println(Bytes.toDouble(value));
+                        }
+                        
+                        System.out.println(Bytes.toLong(value));
                         break;
                     default:
                     //string or blob
