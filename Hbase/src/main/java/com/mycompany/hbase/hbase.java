@@ -260,8 +260,7 @@ public class hbase {
 
                 contentType = new Tika().detect(val);
                 System.out.println(contentType);
-                */
-                
+                 */
                 for (int a = 0; a < rowArray.length; a++) {
                     //System.out.println("row : " +                             Bytes.toString(Arrays.copyOfRange(rowArray, a, a+1 ))+" - "+String.valueOf(Arrays.copyOfRange(rowArray, a, a+1 )[0]));
                 }
@@ -300,7 +299,7 @@ public class hbase {
         table2.put(p);
     }
 
- private static void typeTests(String namespace, String table, String family, Configuration conf) throws IOException {
+    private static void typeTests(String namespace, String table, String family, Configuration conf) throws IOException {
         Connection connection = ConnectionFactory.createConnection(conf);
         Table table2 = connection.getTable(TableName.valueOf(table));
         Scan scan = new Scan();
@@ -315,36 +314,51 @@ public class hbase {
             for (Cell family_cell : result2.listCells()) {
                 byte[] rowArray = family_cell.getRowArray();
                 byte[] fam = Arrays.copyOfRange(rowArray, family_cell.getFamilyOffset(),
-                            family_cell.getFamilyOffset() + family_cell.getFamilyLength());
+                        family_cell.getFamilyOffset() + family_cell.getFamilyLength());
                 byte[] qua = Arrays.copyOfRange(rowArray, family_cell.getQualifierOffset(),
-                            family_cell.getQualifierOffset() + family_cell.getQualifierLength());
-                System.out.println("\ncoluna : " + Bytes.toString(fam)+":"+Bytes.toString(qua));
-                
+                        family_cell.getQualifierOffset() + family_cell.getQualifierLength());
+                System.out.println("\ncoluna : " + Bytes.toString(fam) + ":" + Bytes.toString(qua));
+
                 byte[] value = Arrays.copyOfRange(rowArray, family_cell.getValueOffset(),
                         family_cell.getValueOffset() + family_cell.getValueLength());;
                 int len = family_cell.getValueLength();
                 String valueOf = Bytes.toStringBinary(value);
-                switch(len){
+                switch (len) {
                     case 1:
                         //bool or byte or string 
-                        if(valueOf.contains("\\x")){
-                            if(valueOf.toLowerCase().contains("ff") || valueOf.toLowerCase().contains("00")){
+                        if (valueOf.contains("\\x")) {
+                            if (valueOf.toLowerCase().contains("ff") || valueOf.toLowerCase().contains("00")) {
                                 System.out.println(Bytes.toBoolean(value));
-                            }else{
+                            } else {
                                 System.out.println(valueOf);
                             }
-                        }else{
+                        } else {
                             System.out.println(Bytes.toString(value));
                         }
                         break;
                     case 2:
-                        //short or string
+                        if (valueOf.contains("\\x")) {
+                            System.out.println(Bytes.toShort(value));
+                        } else {
+                            System.out.println(Bytes.toString(value));
+                        }
                         break;
                     case 3:
                         //string
+                        System.out.println(Bytes.toString(value));
                         break;
                     case 4:
-                        //char or float or string
+                        //char or float or integer or string
+                        if (valueOf.contains("\\x")) {
+                            if (!valueOf.startsWith("\\x00\\x00\\x00\\x")&& valueOf.startsWith("\\x00\\x00\\x00")) {
+                                System.out.println(Bytes.toString(value));
+                            }
+                        } else {
+                            System.out.println(Bytes.toString(value));
+                        }
+
+                        System.out.println(Bytes.toFloat(value));
+                        System.out.println(valueOf);
                         break;
                     case 5:
                     case 6:
@@ -355,15 +369,14 @@ public class hbase {
                         //double or long or string
                         break;
                     default:
-                        //string or blob
-                        
+                    //string or blob
+
                 }
-                
+
+            }
         }
     }
- }
-    
-    
+
 }
 
 
