@@ -9,12 +9,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLConnection;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.hadoop.conf.Configuration;
@@ -48,12 +50,17 @@ import org.apache.tika.Tika;
  */
 public class hbase {
 
+    static String encode = "ISO-8859-1";
+
     public static void main(String[] args) throws IOException, Exception {
+        System.setProperty("file.encoding", "UTF-8");
+        System.setProperty("encoding", "UTF-8");
+
         String namespace = "default";
         String table = "pessoas";
         String family = "teste";//"dados";
         Configuration conf = HBaseConfiguration.create();
-        typeTests(namespace, table, family, conf);
+        //typeTests(namespace, table, family, conf);
         //dataTests(namespace, table, family, conf);
         //binaryTests(namespace, table, family, conf);
         //get_tables_and_families(namespace, conf);
@@ -66,12 +73,31 @@ public class hbase {
         //Cell cell = clist.get(0);
         //NavigableMap<byte[], byte[]> familyMap = result2.getFamilyMap(Bytes.toBytes("dados"));
         //List<Cell> columnCells = result2.getColumnCells(Bytes.toBytes("dados"), Bytes.toBytes("estado"));
-        char teste = '9';
+        /*char teste = '9';
         Bytes.toBytes(teste);
         int tint = 57;
         Bytes.toBytes(tint);
-        System.out.println(teste + "bin " + Bytes.toStringBinary(Bytes.toBytes(teste)));
-        System.out.println(tint + "bin " + Bytes.toStringBinary(Bytes.toBytes(tint)));
+
+        byte[] str = Bytes.toBytes("ç");
+        System.out.println(teste + "bin " + Bytes.toStringBinary(str));
+        System.out.println(tint + "bin " + new String(str, "UTF-8"));
+        System.out.println(tint + "bin " + new String(str, encode));
+        System.out.println(tint + "bin " + Bytes.toString(str));
+        str = Bytes.toBytes('ç');
+        System.out.println(teste + "bin " + Bytes.toStringBinary(str));
+        System.out.println(tint + "bin " + new String(str, "UTF-8"));
+        System.out.println(tint + "bin " + new String(str, encode));
+        System.out.println(tint + "bin " + Bytes.toString(str));
+         
+        
+        byte[] str = Bytes.toBytes(lorem_ipsum);
+        long init = System.currentTimeMillis();
+        boolean valid = isUtf8Valid(str);
+        long fim = System.currentTimeMillis();
+        long diffInMillies = Math.abs(init - fim);
+        long diff = TimeUnit.MILLISECONDS.toSeconds(diffInMillies);
+        System.out.println("\nlen - " + str.length + "\nvalid - " + valid + "\ntime - " + diffInMillies);
+         */
     }
 
     public static void scan_all(String table, Configuration conf) throws IOException {
@@ -279,7 +305,7 @@ public class hbase {
         long ln1 = 9;
         float ft1 = (float) 0.5;
         double db1 = 9.9; // long equal = 4621762822593629389
-        String str1 = "9";
+        String str1 = "ç";
         Connection connection = ConnectionFactory.createConnection(conf);
         Table table2 = connection.getTable(TableName.valueOf(table));
         byte[] row1 = Bytes.toBytes("eduardo");
@@ -322,59 +348,123 @@ public class hbase {
                 byte[] value = Arrays.copyOfRange(rowArray, family_cell.getValueOffset(),
                         family_cell.getValueOffset() + family_cell.getValueLength());;
                 int len = family_cell.getValueLength();
-                String valueOf = Bytes.toStringBinary(value);
+                //String valueOf = Bytes.toStringBinary(value);
                 switch (len) {
                     case 1:
-                        //bool or byte or string 
-                        if (valueOf.contains("\\x")) {
-                            if (valueOf.toLowerCase().contains("ff") || valueOf.toLowerCase().contains("00")) {
-                                System.out.println(Bytes.toBoolean(value));
-                            } else {
-                                System.out.println(valueOf);
-                            }
-                        } else {
+                        //bool or byte or string
+                        /*
+                        strings são representadas em UTF-8  e o método toStringBinary em unicode contudo como para um byte
+                        a codificação é a mesma para ambos uma string
+                        de um byte nunca contém o identificar de hexadecial "\x". ainda que isso nao garanta que o valor é uma string
+                        pois o mesmo pode ser um byte.
+                        
+                        dentre os valores hexadecimais o FF e 00 são reservados para guardar valores booleanos, sendo 00 false e FF true.
+                        
+                        se qualquer outro valor hexadecimal for encontrado garantidamente o valor é do tipo byte.
+                         */
+                        if (isUtf8Valid(value)) {
+                            //string or byte
                             System.out.println(Bytes.toString(value));
+
+                        } else if (value[0] == -1 || value[0] == 0) {
+                            //boolean or byte
+                            System.out.println(Bytes.toBoolean(value));
+
+                        } else {
+                            //byte
+                            System.out.println(Bytes.toStringBinary(value));
                         }
                         break;
                     case 2:
-                        if (valueOf.contains("\\x")) {
+                        //short or string
+                        /*
+                         strings são representadas em UTF-8  e o método toStringBinary em unicode contudo como 
+                        para dois bytes podem acontecer 3 casos:
+                        uma string com dois caracteres de um byte(utf8), nao contem \x
+                        uma string com um caractere de dois bytes(utf8), contem dois \x
+                        uma entra dom penas um valor \x, garantidamente short
+                        ainda que isso nao garanta que o valor é uma string
+                        pois o mesmo pode ser um short.
+                         */
+                        if (isUtf8Valid(value)) {
+                            //string or short
+                            System.out.println(Bytes.toString(value));
                             System.out.println(Bytes.toShort(value));
                         } else {
-                            System.out.println(Bytes.toString(value));
+                            //short
+                            System.out.println(Bytes.toShort(value));
                         }
                         break;
                     case 3:
                         //string
-                        System.out.println(Bytes.toString(value));
+                        if (isUtf8Valid(value)) {
+                            System.out.println(Bytes.toString(value));
+                        }
                         break;
                     case 4:
                         //char or float or integer or string
-                        if (valueOf.contains("\\x")) {
-                            if (!valueOf.startsWith("\\x00\\x00\\x00\\x")&& valueOf.startsWith("\\x00\\x00\\x00")) {
-                                System.out.println(Bytes.toString(value));
-                            }
-                        } else {
+                        /*
+                        esse é complicado, mas garantidamente pode-se dizer que não existe possibilidade de um 
+                        valor ser char ou string ao mesmo tempo pois char tem os dois primeiros bytes \x00 e esse valor 
+                        não é aceito como caractere de string
+                        */
+                        if (isUtf8Valid(value)) {
                             System.out.println(Bytes.toString(value));
+                        }else if(value[0] == 0 && value[1] == 0 && value[2] == 0 && value[3] != 0){
+                            System.out.println(new String(value, "ISO-8859-1"));
                         }
+                        
+                        
 
-                        System.out.println(Bytes.toFloat(value));
+                        System.out.println(Bytes.toInt(value));
                         System.out.println(valueOf);
                         break;
                     case 5:
                     case 6:
                     case 7:
-                        //string 
+                        //string
+                        if (isUtf8Valid(value)) {
+                            System.out.println(Bytes.toString(value));
+                        }
                         break;
                     case 8:
                         //double or long or string
                         break;
                     default:
                     //string or blob
+                        if (isUtf8Valid(value)) {
+                            System.out.println(Bytes.toString(value));
+                        }else{
+                            System.out.println(Bytes.toString(value));
+                        }
 
                 }
 
             }
         }
+    }
+
+    public static boolean isUtf8Valid(byte[] value) {
+        int min = 1, max = 126;
+        int c2 = -62, c2Min = -128, c2Max = -65;
+        int c3 = -61, c3Min = -128, c3Max = -65;
+
+        for (int i = 0; i < value.length; i++) {
+            if (value[i] >= min && value[i] <= max) {
+                continue;
+            } else if ((i + 1) < value.length) {
+                if (value[i] == c2 && value[i + 1] >= c2Min && value[i + 1] <= c2Max) {
+                    continue;
+                } else if (value[i] == c3 && value[i + 1] >= c3Min && value[i + 1] <= c3Max) {
+                    continue;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
