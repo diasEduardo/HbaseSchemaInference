@@ -51,8 +51,14 @@ import org.apache.tika.Tika;
 public class hbase {
 
     static String encode = "ISO-8859-1";
+    static String namespace = "tests";//"hBaseSchemaInference";
 
     public static void main(String[] args) throws IOException, Exception {
+        HbaseOperations ops = new HbaseOperations();
+        short result = ops.createNamespace(namespace);
+        System.out.println(result);
+        short tableRes = ops.createTable(namespace,"testTable",(new String[]{"family1","family2"}));
+        System.out.println(tableRes);
         System.setProperty("file.encoding", "UTF-8");
         System.setProperty("encoding", "UTF-8");
 
@@ -60,7 +66,7 @@ public class hbase {
         String table = "pessoas";
         String family = "teste";//"dados";
         Configuration conf = HBaseConfiguration.create();
-        typeTests(namespace, table, family, conf);
+        //typeTests(namespace, table, family, conf);
         //dataTests(namespace, table, family, conf);
         //binaryTests(namespace, table, family, conf);
         //get_tables_and_families(namespace, conf);
@@ -98,6 +104,7 @@ public class hbase {
         long diff = TimeUnit.MILLISECONDS.toSeconds(diffInMillies);
         System.out.println("\nlen - " + str.length + "\nvalid - " + valid + "\ntime - " + diffInMillies);
          */
+        /*
         int a = 2139127936;
         byte[] b = Bytes.toBytes(a);
         byte test = (byte) (b[1] >> 1);
@@ -106,10 +113,11 @@ public class hbase {
         byte[] d = Bytes.toBytes(c);
         
         System.out.println(Bytes.toDouble(d));
+        */
     }
 
     public static void scan_all(String table, Configuration conf) throws IOException {
-        Connection connection = ConnectionFactory.createConnection(conf);
+        Connection connection = ConnectionFactory.createConnection();
         Table table2 = connection.getTable(TableName.valueOf(table));
         Scan scan = new Scan();
         ResultScanner scanner = table2.getScanner(scan);
