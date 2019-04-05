@@ -50,9 +50,10 @@ public class HbaseOperations {
 
     /*
         return 
+         1 if namespace already exists
+         0 on sucess 
         -1 on erro
-        0 on sucess and
-        1 if namespace already exists
+        
      */
     public short createNamespace(String name) {
         Admin admin = null;
@@ -85,10 +86,12 @@ public class HbaseOperations {
 
     /*
         return 
+         1 if table already exists
+         0 on sucess 
         -1 on erro
         -2 namespace dont exists
-        0 on sucess and
-        1 if table already exists
+        -3 error on creation
+        
      */
     public short createTable(String namespace, String name, String[] familyName) {
         Admin admin = null;
@@ -129,6 +132,64 @@ public class HbaseOperations {
         } catch (IOException ex) {
             Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
             return -3;
+        }
+
+        return 0;
+
+    }
+
+    /*
+        return 
+         1 all families already exists
+         0 on sucess 
+        -1 on erro
+        -2 namespace dont exists
+        -3 table dont exists
+        -4 error on modify
+        
+     */
+    public short alterFamilies(String namespace, String table, String[] familyName) {
+        Admin admin = null;
+        try {
+
+            Connection connection = connect();
+            admin = connection.getAdmin();
+
+        } catch (IOException ex) {
+            Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
+            return -1;
+
+        }
+
+        try {
+            admin.getNamespaceDescriptor(namespace);
+
+        } catch (IOException ex) {
+            return -2;
+        }
+
+        TableName tableName = TableName.valueOf(namespace, table);
+        HTableDescriptor desc = null;
+        try {
+            desc = admin.getTableDescriptor(tableName);
+        } catch (IOException ex) {
+            return -3;
+        }
+        boolean allFamilyExists = true;
+        for (String family : familyName) {
+            HColumnDescriptor coldef = new HColumnDescriptor(Bytes.toBytes(family));
+            if (!desc.hasFamily(Bytes.toBytes(family))) {
+                allFamilyExists = false;
+                desc.addFamily(coldef);
+            }
+        }
+        if (allFamilyExists) {
+            return 1;
+        }
+        try {
+            admin.modifyTable(tableName, desc);
+        } catch (IOException ex) {
+            return -4;
         }
 
         return 0;

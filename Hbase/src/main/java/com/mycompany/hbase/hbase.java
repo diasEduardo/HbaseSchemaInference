@@ -52,13 +52,16 @@ public class hbase {
 
     static String encode = "ISO-8859-1";
     static String namespace = "tests";//"hBaseSchemaInference";
+    static String table = "testTable";
 
     public static void main(String[] args) throws IOException, Exception {
         HbaseOperations ops = new HbaseOperations();
         short result = ops.createNamespace(namespace);
         System.out.println(result);
-        short tableRes = ops.createTable(namespace,"testTable",(new String[]{"family1","family2"}));
+        short tableRes = ops.createTable(namespace,table,(new String[]{"family1", "family2"}));
         System.out.println(tableRes);
+        short tableRes1 = ops.alterFamilies(namespace,table,(new String[]{"family3"}));
+        System.out.println(tableRes1);
         System.setProperty("file.encoding", "UTF-8");
         System.setProperty("encoding", "UTF-8");
 
