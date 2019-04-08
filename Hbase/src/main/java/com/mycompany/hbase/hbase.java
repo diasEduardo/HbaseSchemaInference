@@ -53,15 +53,18 @@ public class hbase {
     static String encode = "ISO-8859-1";
     static String namespace = "tests";//"hBaseSchemaInference";
     static String table = "testTable";
+    static String family = "family1";
 
     public static void main(String[] args) throws IOException, Exception {
         HbaseOperations ops = new HbaseOperations();
         short result = ops.createNamespace(namespace);
         System.out.println(result);
-        short tableRes = ops.createTable(namespace,table,(new String[]{"family1", "family2"}));
+        short tableRes = ops.createTable(namespace, table, (new String[]{family, "family2"}));
         System.out.println(tableRes);
-        short tableRes1 = ops.alterFamilies(namespace,table,(new String[]{"family3"}));
+        short tableRes1 = ops.alterFamilies(namespace, table, (new String[]{"family3"}));
         System.out.println(tableRes1);
+        short putRes = ops.putData(namespace, table, "test1", Bytes.toBytes(family), Bytes.toBytes("nome"), Bytes.toBytes("eduardo"));
+        System.out.println(putRes);
         System.setProperty("file.encoding", "UTF-8");
         System.setProperty("encoding", "UTF-8");
 
@@ -69,7 +72,7 @@ public class hbase {
         String table = "pessoas";
         String family = "teste";//"dados";
         Configuration conf = HBaseConfiguration.create();
-        //typeTests(namespace, table, family, conf);
+        typeTests(namespace, table, family, conf);
         //dataTests(namespace, table, family, conf);
         //binaryTests(namespace, table, family, conf);
         //get_tables_and_families(namespace, conf);
@@ -107,7 +110,7 @@ public class hbase {
         long diff = TimeUnit.MILLISECONDS.toSeconds(diffInMillies);
         System.out.println("\nlen - " + str.length + "\nvalid - " + valid + "\ntime - " + diffInMillies);
          */
-        /*
+ /*
         int a = 2139127936;
         byte[] b = Bytes.toBytes(a);
         byte test = (byte) (b[1] >> 1);
@@ -116,7 +119,7 @@ public class hbase {
         byte[] d = Bytes.toBytes(c);
         
         System.out.println(Bytes.toDouble(d));
-        */
+         */
     }
 
     public static void scan_all(String table, Configuration conf) throws IOException {
@@ -426,14 +429,14 @@ public class hbase {
                         esse é complicado, mas garantidamente pode-se dizer que não existe possibilidade de um 
                         valor ser char ou string ao mesmo tempo pois char tem os dois primeiros bytes \x00 e esse valor 
                         não é aceito como caractere de string
-                        */
+                         */
                         if (isUtf8Valid(value)) {
                             System.out.println(Bytes.toString(value));
-                        }else if(value[0] == 0 && value[1] == 0 && value[2] == 0 && value[3] != 0){
+                        } else if (value[0] == 0 && value[1] == 0 && value[2] == 0 && value[3] != 0) {
                             System.out.println(new String(value, "ISO-8859-1"));
                         }
-                        
-                        if( (value[0] != -1 && value[0] != 127 ) || value[1] >= 0){
+
+                        if ((value[0] != -1 && value[0] != 127) || value[1] >= 0) {
                             System.out.println(Bytes.toFloat(value));
                         }
 
@@ -453,17 +456,17 @@ public class hbase {
                             System.out.println(Bytes.toString(value));
                         }
                         //01111111 11110000
-                        if( (value[0] != -1 && value[0] != 127 ) || (value[1] < -16 || value[1] > -1 )){
+                        if ((value[0] != -1 && value[0] != 127) || (value[1] < -16 || value[1] > -1)) {
                             System.out.println(Bytes.toDouble(value));
                         }
-                        
+
                         System.out.println(Bytes.toLong(value));
                         break;
                     default:
-                    //string or blob
+                        //string or blob
                         if (isUtf8Valid(value)) {
                             System.out.println(Bytes.toString(value));
-                        }else{
+                        } else {
                             System.out.println(Bytes.toString(value));
                         }
 
@@ -474,19 +477,40 @@ public class hbase {
     }
 
     public static boolean isUtf8Valid(byte[] value) {
-        int min = 1, max = 126;
-        int c2 = -62, c2Min = -128, c2Max = -65;
-        int c3 = -61, c3Min = -128, c3Max = -65;
+        int c1Min = 0x1, c1Max = 0x7E;
+        int c2Min = 0xC0, c2Max = 0xDF;
+        int c3Min = 0xE0, c3Max = 0xEF;
+        int c4Min = 0xF0, c4Max = 0xF7;
+        int min = 0x80, max = 0xBF;
 
         for (int i = 0; i < value.length; i++) {
-            if (value[i] >= min && value[i] <= max) {
+            if (value[i] >= c1Min && value[i] <= c1Max) {
                 continue;
-            } else if ((i + 1) < value.length) {
-                if (value[i] == c2 && value[i + 1] >= c2Min && value[i + 1] <= c2Max) {
-                    continue;
-                } else if (value[i] == c3 && value[i + 1] >= c3Min && value[i + 1] <= c3Max) {
+            } else if ((i + 1) < value.length && value[i] >= c2Min && value[i] <= c2Max) {
+                
+                if (value[i+1] >= min && value[i+1] <= max) {
+                    i++;
                     continue;
                 } else {
+                    return false;
+                }
+            } else if ((i + 2) < value.length && value[i] >= c3Min && value[i] <= c3Max) {
+                
+                if (value[i+1] >= min && value[i+1] <= max &&
+                        value[i+2] >= min && value[i+2] <= max) {
+                    i+=2;    
+                    continue;
+                }else {
+                    return false;
+                }
+            } else if ((i + 3) < value.length && value[i] >= c4Min && value[i] <= c4Max) {
+                
+                if (value[i+1] >= min && value[i+1] <= max &&
+                        value[i+2] >= min && value[i+2] <= max &&
+                        value[i+3] >= min && value[i+3] <= max) {
+                    i+=3;    
+                    continue;
+                }else {
                     return false;
                 }
             } else {
@@ -495,7 +519,12 @@ public class hbase {
         }
         return true;
     }
-
+    /*System.out.println("" +  + " - " + 0x7E+" diff = "+(0x7E-0x1));
+        System.out.println("" + 0xC080+ " - " +0xDFBF+" diff = "+(0xDFBF-0xC080));
+        System.out.println("" + 0xE08080+ " - " +0xEFBFBF+" diff = "+(0xEFBFBF-0xE08080));
+        System.out.println("" + 0xF0808080L+ " - " +0xF7BFBFBFL+" diff = "+(0xF7BFBFBFL-0xF0808080L));
+        System.out.println(String.valueOf((char)0xF09FA496));
+     */
 }
 
 

@@ -21,6 +21,8 @@ import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
+import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.security.User;
 import org.apache.hadoop.hbase.util.Bytes;
 
@@ -195,4 +197,34 @@ public class HbaseOperations {
         return 0;
 
     }
+    
+    /*
+        return
+        0 on sucess
+        -1 table not founded
+        -2 put error
+    
+    */
+    
+    public short putData(String namespace, String table, String row, byte[] family, byte[] column, byte[] value) {
+        Connection connection = connect();
+        TableName tableName = TableName.valueOf(namespace, table);
+        byte[] rowName = Bytes.toBytes(row);
+        Put p = new Put(rowName);
+        Table tableClass = null;
+        try {
+            tableClass = connection.getTable(tableName);
+        } catch (IOException ex) {
+            return -1;
+        }
+        p.addColumn(family,column,value);
+        try {
+            tableClass.put(p);
+        } catch (IOException ex) {
+            return -2;
+        }
+        return 0;
+
+    }
+
 }
