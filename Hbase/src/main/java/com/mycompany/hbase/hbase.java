@@ -65,6 +65,9 @@ public class hbase {
         System.out.println(tableRes1);
         short putRes = ops.putData(namespace, table, "test1", Bytes.toBytes(family), Bytes.toBytes("nome"), Bytes.toBytes("eduardo"));
         System.out.println(putRes);
+        TablePopulator populator =new TablePopulator(namespace, table, 2, 10);
+        
+        
         System.setProperty("file.encoding", "UTF-8");
         System.setProperty("encoding", "UTF-8");
 
@@ -72,7 +75,7 @@ public class hbase {
         String table = "pessoas";
         String family = "teste";//"dados";
         Configuration conf = HBaseConfiguration.create();
-        typeTests(namespace, table, family, conf);
+        //typeTests(namespace, table, family, conf);
         //dataTests(namespace, table, family, conf);
         //binaryTests(namespace, table, family, conf);
         //get_tables_and_families(namespace, conf);
@@ -432,7 +435,7 @@ public class hbase {
                          */
                         if (isUtf8Valid(value)) {
                             System.out.println(Bytes.toString(value));
-                        } else if (value[0] == 0 && value[1] == 0 && value[2] == 0 && value[3] != 0) {
+                        } else if (value[0] == 0 && value[1] == 0 && (value[2] != 0 || value[3] != 0)) {
                             System.out.println(new String(value, "ISO-8859-1"));
                         }
 
@@ -519,12 +522,7 @@ public class hbase {
         }
         return true;
     }
-    /*System.out.println("" +  + " - " + 0x7E+" diff = "+(0x7E-0x1));
-        System.out.println("" + 0xC080+ " - " +0xDFBF+" diff = "+(0xDFBF-0xC080));
-        System.out.println("" + 0xE08080+ " - " +0xEFBFBF+" diff = "+(0xEFBFBF-0xE08080));
-        System.out.println("" + 0xF0808080L+ " - " +0xF7BFBFBFL+" diff = "+(0xF7BFBFBFL-0xF0808080L));
-        System.out.println(String.valueOf((char)0xF09FA496));
-     */
+
 }
 
 
