@@ -5,6 +5,8 @@
  */
 package com.mycompany.hbase;
 
+import HbaseSchemaInference.control.HbaseOperations;
+import HbaseSchemaInference.model.RawSchema;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLConnection;
@@ -57,6 +59,9 @@ public class hbase {
 
     public static void main(String[] args) throws IOException, Exception {
         HbaseOperations ops = new HbaseOperations();
+        RawSchema rawSchema = new RawSchema(namespace, ops);
+        rawSchema.getRawSchema();
+        
         short result = ops.createNamespace(namespace);
         System.out.println(result);
         short tableRes = ops.createTable(namespace, table, (new String[]{family, "family2"}));
@@ -65,7 +70,7 @@ public class hbase {
         System.out.println(tableRes1);
         short putRes = ops.putData(namespace, table, "test1", Bytes.toBytes(family), Bytes.toBytes("nome"), Bytes.toBytes("eduardo"));
         System.out.println(putRes);
-        TablePopulator populator =new TablePopulator(namespace, table, 2, 10);
+        //TablePopulator populator =new TablePopulator(namespace, table, 2, 10);
         
         
         System.setProperty("file.encoding", "UTF-8");

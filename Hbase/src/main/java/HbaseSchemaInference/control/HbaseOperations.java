@@ -7,7 +7,7 @@
 https://github.com/larsgeorge/hbase-book/tree/master/ch05/src/main/java/admin code reference.
 
  */
-package com.mycompany.hbase;
+package HbaseSchemaInference.control;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -197,15 +197,14 @@ public class HbaseOperations {
         return 0;
 
     }
-    
+
     /*
         return
         0 on sucess
         -1 table not founded
         -2 put error
     
-    */
-    
+     */
     public short putData(String namespace, String table, String row, byte[] family, byte[] column, byte[] value) {
         Connection connection = connect();
         TableName tableName = TableName.valueOf(namespace, table);
@@ -217,7 +216,7 @@ public class HbaseOperations {
         } catch (IOException ex) {
             return -1;
         }
-        p.addColumn(family,column,value);
+        p.addColumn(family, column, value);
         try {
             tableClass.put(p);
         } catch (IOException ex) {
@@ -225,6 +224,116 @@ public class HbaseOperations {
         }
         return 0;
 
+    }
+
+    /*
+        return 
+         0 on sucess 
+        -1 on erro
+        -2 namespace dont exists
+        -3 error on disable and delete
+        
+     */
+    public short deleteTable(String namespace, String table) {
+        Admin admin = null;
+        try {
+
+            Connection connection = connect();
+            admin = connection.getAdmin();
+
+        } catch (IOException ex) {
+            Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
+            return -1;
+
+        }
+
+        try {
+            admin.getNamespaceDescriptor(namespace);
+
+        } catch (IOException ex) {
+            return -2;
+        }
+
+        TableName tableName = TableName.valueOf(namespace, table);
+
+        try {
+            admin.disableTable(tableName);
+            admin.deleteTable(tableName);
+        } catch (IOException ex) {
+            return -3;
+        }
+        return 0;
+    }
+
+
+    /*
+        return the table names of a namespace
+     */
+    public String[] getTables(String namespace) {
+        Admin admin = null;
+        try {
+
+            Connection connection = connect();
+            admin = connection.getAdmin();
+
+        } catch (IOException ex) {
+            Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+
+        }
+        NamespaceDescriptor namespaceDescriptor;
+        try {
+            namespaceDescriptor = admin.getNamespaceDescriptor(namespace);
+
+        } catch (IOException ex) {
+            return null;
+        }
+
+        HTableDescriptor[] tables = new HTableDescriptor[0];
+        try {
+            tables = admin.listTableDescriptorsByNamespace(namespace);
+        } catch (IOException ex) {
+            return null;
+        }
+        String[] tableNames = new String[tables.length];
+        for (int i = 0; i < tables.length; i++) {
+            tableNames[i] = tables[i].getNameAsString().split(":")[1];
+
+        }
+        return tableNames;
+    }
+
+    /*
+        return the table names of a namespace
+     */
+    public String[] getfamilies(String namespace, String table) {
+        Admin admin = null;
+        try {
+
+            Connection connection = connect();
+            admin = connection.getAdmin();
+
+        } catch (IOException ex) {
+            Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+
+        }
+        
+        TableName tableName = TableName.valueOf(namespace, table);
+        HTableDescriptor desc = null;
+        try {
+            desc = admin.getTableDescriptor(tableName);
+        } catch (IOException ex) {
+            return null;
+        }
+
+        HColumnDescriptor[] columnFamilies = desc.getColumnFamilies();
+        String[] familyNames = new String[columnFamilies.length];
+        for (int j = 0; j < columnFamilies.length; j++) {
+            familyNames[j] = columnFamilies[j].getNameAsString();
+        }
+
+        return familyNames;
     }
 
 }

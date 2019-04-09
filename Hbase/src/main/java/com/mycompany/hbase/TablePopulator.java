@@ -5,6 +5,7 @@
  */
 package com.mycompany.hbase;
 
+import HbaseSchemaInference.control.HbaseOperations;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import org.apache.hadoop.hbase.util.Bytes;
