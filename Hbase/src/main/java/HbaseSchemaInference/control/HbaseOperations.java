@@ -9,10 +9,15 @@ https://github.com/larsgeorge/hbase-book/tree/master/ch05/src/main/java/admin co
  */
 package HbaseSchemaInference.control;
 
+import HbaseSchemaInference.model.PutData;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
@@ -22,6 +27,9 @@ import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.security.User;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -59,9 +67,8 @@ public class HbaseOperations {
      */
     public short createNamespace(String name) {
         Admin admin = null;
+        Connection connection = connect();
         try {
-
-            Connection connection = connect();
             admin = connection.getAdmin();
 
         } catch (IOException ex) {
@@ -81,7 +88,11 @@ public class HbaseOperations {
                 Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
-
+        try {
+            connection.close();
+        } catch (IOException ex) {
+            Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return 0;
 
     }
@@ -97,9 +108,8 @@ public class HbaseOperations {
      */
     public short createTable(String namespace, String name, String[] familyName) {
         Admin admin = null;
+        Connection connection = connect();
         try {
-
-            Connection connection = connect();
             admin = connection.getAdmin();
 
         } catch (IOException ex) {
@@ -135,6 +145,11 @@ public class HbaseOperations {
             Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
             return -3;
         }
+        try {
+            connection.close();
+        } catch (IOException ex) {
+            Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         return 0;
 
@@ -152,9 +167,8 @@ public class HbaseOperations {
      */
     public short alterFamilies(String namespace, String table, String[] familyName) {
         Admin admin = null;
+        Connection connection = connect();;
         try {
-
-            Connection connection = connect();
             admin = connection.getAdmin();
 
         } catch (IOException ex) {
@@ -194,6 +208,12 @@ public class HbaseOperations {
             return -4;
         }
 
+        try {
+            connection.close();
+        } catch (IOException ex) {
+            Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         return 0;
 
     }
@@ -222,6 +242,48 @@ public class HbaseOperations {
         } catch (IOException ex) {
             return -2;
         }
+
+        try {
+            connection.close();
+        } catch (IOException ex) {
+            Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return 0;
+
+    }
+
+    /*
+        return
+        0 on sucess
+        -1 table not founded
+        -2 put error
+    
+     */
+    public short putArrayOfData(String namespace, String table, String row, ArrayList<PutData> data) {
+        Connection connection = connect();
+        TableName tableName = TableName.valueOf(namespace, table);
+        byte[] rowName = Bytes.toBytes(row);
+        Put p = new Put(rowName);
+        Table tableClass = null;
+        try {
+            tableClass = connection.getTable(tableName);
+        } catch (IOException ex) {
+            return -1;
+        }
+        for (PutData entry : data) {
+            p.addColumn(entry.getFamily(), entry.getColumn(), entry.getValue());
+        }
+        try {
+            tableClass.put(p);
+        } catch (IOException ex) {
+            return -2;
+        }
+
+        try {
+            connection.close();
+        } catch (IOException ex) {
+            Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return 0;
 
     }
@@ -236,9 +298,8 @@ public class HbaseOperations {
      */
     public short deleteTable(String namespace, String table) {
         Admin admin = null;
+        Connection connection = connect();
         try {
-
-            Connection connection = connect();
             admin = connection.getAdmin();
 
         } catch (IOException ex) {
@@ -262,6 +323,12 @@ public class HbaseOperations {
         } catch (IOException ex) {
             return -3;
         }
+
+        try {
+            connection.close();
+        } catch (IOException ex) {
+            Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return 0;
     }
 
@@ -271,9 +338,8 @@ public class HbaseOperations {
      */
     public String[] getTables(String namespace) {
         Admin admin = null;
+        Connection connection = connect();
         try {
-
-            Connection connection = connect();
             admin = connection.getAdmin();
 
         } catch (IOException ex) {
@@ -300,17 +366,23 @@ public class HbaseOperations {
             tableNames[i] = tables[i].getNameAsString().split(":")[1];
 
         }
+
+        try {
+            connection.close();
+        } catch (IOException ex) {
+            Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         return tableNames;
     }
 
     /*
         return the table names of a namespace
      */
-    public String[] getfamilies(String namespace, String table) {
+    public String[] getFamilies(String namespace, String table) {
         Admin admin = null;
+        Connection connection = connect();
         try {
-
-            Connection connection = connect();
             admin = connection.getAdmin();
 
         } catch (IOException ex) {
@@ -318,7 +390,7 @@ public class HbaseOperations {
             return null;
 
         }
-        
+
         TableName tableName = TableName.valueOf(namespace, table);
         HTableDescriptor desc = null;
         try {
@@ -333,7 +405,91 @@ public class HbaseOperations {
             familyNames[j] = columnFamilies[j].getNameAsString();
         }
 
+        try {
+            connection.close();
+        } catch (IOException ex) {
+            Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         return familyNames;
+    }
+
+    public String[] getColumns(String namespace, String table, String family) {
+        String[] columnNames = new String[0];
+
+        Connection connection = connect();
+
+        TableName tableName = TableName.valueOf(namespace, table);
+
+        Table table2 = null;
+        try {
+            table2 = connection.getTable(tableName);
+        } catch (IOException ex) {
+            return null;
+        }
+        Scan scan = new Scan();
+        scan.addFamily(Bytes.toBytes(family));
+
+        try {
+            ResultScanner scanner = table2.getScanner(scan);
+            for (Result result2 = scanner.next(); result2 != null; result2 = scanner.next()) {
+                List<Cell> family_cells = result2.listCells();
+                String[] tempNames = new String[family_cells.size()];
+                int i = 0;
+                for (Cell family_cell : result2.listCells()) {
+                    byte[] rowArray = family_cell.getRowArray();
+                    byte[] column = Arrays.copyOfRange(rowArray, family_cell.getQualifierOffset(), family_cell.getQualifierOffset() + family_cell.getQualifierLength());
+                    tempNames[i] = Bytes.toString(column);
+                    i++;
+                }
+                columnNames = combine(columnNames, tempNames);
+            }
+        } catch (IOException ex) {
+            return null;
+        }
+
+        try {
+            connection.close();
+        } catch (IOException ex) {
+            Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return columnNames;
+    }
+
+    public ResultScanner getValuesScan(String namespace, String table, String family, String column) {
+        Connection connection = connect();
+
+        TableName tableName = TableName.valueOf(namespace, table);
+
+        Table table2 = null;
+        try {
+            table2 = connection.getTable(tableName);
+        } catch (IOException ex) {
+            return null;
+        }
+        Scan scan = new Scan();
+        scan.addColumn(Bytes.toBytes(family), Bytes.toBytes(column));
+        ResultScanner scanner = null;
+        try {
+            scanner = table2.getScanner(scan);
+
+        } catch (IOException ex) {
+            return null;
+        }
+
+        return scanner;
+    }
+
+    /*
+        https://javarevisited.blogspot.com/2013/02/combine-integer-and-string-array-java-example-tutorial.html
+     */
+    public String[] combine(String[] a, String[] b) {
+        int length = a.length + b.length;
+        String[] result = new String[length];
+        System.arraycopy(a, 0, result, 0, a.length);
+        System.arraycopy(b, 0, result, a.length, b.length);
+        return result;
     }
 
 }
