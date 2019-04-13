@@ -52,34 +52,43 @@ import org.apache.tika.Tika;
  */
 public class hbase {
 
-    static String encode = "ISO-8859-1";
-    static String namespace = "tests";//"hBaseSchemaInference";
-    static String table = "testTable";
-    static String family = "family1";
+    static String namespace = "hBaseSchemaInference";
+    static String table = "rawSchemas";
+    static String family = "data";
 
     public static void main(String[] args) throws IOException, Exception {
         HbaseOperations ops = new HbaseOperations();
-        RawSchema rawSchema = new RawSchema(namespace, ops);
-        rawSchema.getRawSchema();
+        //ops.deleteNamespace(namespace);
+        //ops.deleteNamespace("tests_rawSchema_15551"+"11674769");
         
-        short result = ops.createNamespace(namespace);
-        System.out.println(result);
-        short tableRes = ops.createTable(namespace, table, (new String[]{family, "family2"}));
-        System.out.println(tableRes);
-        short tableRes1 = ops.alterFamilies(namespace, table, (new String[]{"family3"}));
-        System.out.println(tableRes1);
-        short putRes = ops.putData(namespace, table, "test1", Bytes.toBytes(family), Bytes.toBytes("nome"), Bytes.toBytes("eduardo"));
-        System.out.println(putRes);
-        //TablePopulator populator =new TablePopulator(namespace, table, 2, 10);
+        ops.createNamespace(namespace);
+        ops.createTable(namespace, table, (new String[]{family}));
+        String inferenceNamespace = "tests";
+        Date date = new Date();
+        String newNamespace = inferenceNamespace + "_rawSchema_" + date.getTime();
+        ops.putData(namespace, table, inferenceNamespace, Bytes.toBytes(family), Bytes.toBytes(newNamespace), Bytes.toBytes(newNamespace));
+        RawSchema rawSchema = new RawSchema(inferenceNamespace, ops, newNamespace);
         
+        long rawTime = rawSchema.getRawSchema();
+        rawSchema.rawToJSON();
         
-        System.setProperty("file.encoding", "UTF-8");
-        System.setProperty("encoding", "UTF-8");
 
-        String namespace = "default";
-        String table = "pessoas";
-        String family = "teste";//"dados";
-        Configuration conf = HBaseConfiguration.create();
+        //short result = ops.createNamespace(namespace);
+        //System.out.println(result);
+        //short tableRes = ops.createTable(namespace, table, (new String[]{family, "family2"}));
+        //System.out.println(tableRes);
+        //short tableRes1 = ops.alterFamilies(namespace, table, (new String[]{"family3"}));
+        //System.out.println(tableRes1);
+        //short putRes = ops.putData(namespace, table, "test1", Bytes.toBytes(family), Bytes.toBytes("nome"), Bytes.toBytes("eduardo"));
+        ///System.out.println(putRes);
+        //TablePopulator populator =new TablePopulator(namespace, table, 2, 10);
+        //
+        //System.setProperty("file.encoding", "UTF-8");
+        //System.setProperty("encoding", "UTF-8");
+        //String namespace = "default";
+        //String table = "pessoas";
+        //String family = "teste";//"dados";
+        //Configuration conf = HBaseConfiguration.create();
         //typeTests(namespace, table, family, conf);
         //dataTests(namespace, table, family, conf);
         //binaryTests(namespace, table, family, conf);
@@ -495,30 +504,30 @@ public class hbase {
             if (value[i] >= c1Min && value[i] <= c1Max) {
                 continue;
             } else if ((i + 1) < value.length && value[i] >= c2Min && value[i] <= c2Max) {
-                
-                if (value[i+1] >= min && value[i+1] <= max) {
+
+                if (value[i + 1] >= min && value[i + 1] <= max) {
                     i++;
                     continue;
                 } else {
                     return false;
                 }
             } else if ((i + 2) < value.length && value[i] >= c3Min && value[i] <= c3Max) {
-                
-                if (value[i+1] >= min && value[i+1] <= max &&
-                        value[i+2] >= min && value[i+2] <= max) {
-                    i+=2;    
+
+                if (value[i + 1] >= min && value[i + 1] <= max
+                        && value[i + 2] >= min && value[i + 2] <= max) {
+                    i += 2;
                     continue;
-                }else {
+                } else {
                     return false;
                 }
             } else if ((i + 3) < value.length && value[i] >= c4Min && value[i] <= c4Max) {
-                
-                if (value[i+1] >= min && value[i+1] <= max &&
-                        value[i+2] >= min && value[i+2] <= max &&
-                        value[i+3] >= min && value[i+3] <= max) {
-                    i+=3;    
+
+                if (value[i + 1] >= min && value[i + 1] <= max
+                        && value[i + 2] >= min && value[i + 2] <= max
+                        && value[i + 3] >= min && value[i + 3] <= max) {
+                    i += 3;
                     continue;
-                }else {
+                } else {
                     return false;
                 }
             } else {

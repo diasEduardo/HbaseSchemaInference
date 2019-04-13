@@ -332,6 +332,51 @@ public class HbaseOperations {
         return 0;
     }
 
+    /*
+        return 
+         0 on sucess 
+        -1 on erro
+        -2 namespace dont exists
+        -3 error on disable and delete
+        
+     */
+    public short deleteNamespace(String namespace) {
+        Admin admin = null;
+        Connection connection = connect();
+        try {
+            admin = connection.getAdmin();
+
+        } catch (IOException ex) {
+            Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
+            return -1;
+
+        }
+        NamespaceDescriptor namespaceDescriptor = null;
+        try {
+            namespaceDescriptor = admin.getNamespaceDescriptor(namespace);
+
+        } catch (IOException ex) {
+            return -2;
+        }
+        String[] tables = this.getTables(namespace);
+        for (String table : tables) {
+            deleteTable(namespace, table);
+        }
+
+        try {
+            admin.deleteNamespace(namespace);
+        } catch (IOException ex) {
+            return -3;
+        }
+
+        try {
+            connection.close();
+        } catch (IOException ex) {
+            Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return 0;
+    }
+
 
     /*
         return the table names of a namespace
@@ -470,6 +515,29 @@ public class HbaseOperations {
         }
         Scan scan = new Scan();
         scan.addColumn(Bytes.toBytes(family), Bytes.toBytes(column));
+        ResultScanner scanner = null;
+        try {
+            scanner = table2.getScanner(scan);
+
+        } catch (IOException ex) {
+            return null;
+        }
+
+        return scanner;
+    }
+
+    public ResultScanner getTableScan(String namespace, String table) {
+        Connection connection = connect();
+
+        TableName tableName = TableName.valueOf(namespace, table);
+
+        Table table2 = null;
+        try {
+            table2 = connection.getTable(tableName);
+        } catch (IOException ex) {
+            return null;
+        }
+        Scan scan = new Scan();
         ResultScanner scanner = null;
         try {
             scanner = table2.getScanner(scan);
