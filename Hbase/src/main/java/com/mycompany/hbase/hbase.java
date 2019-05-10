@@ -55,23 +55,37 @@ public class hbase {
     static String namespace = "hBaseSchemaInference";
     static String table = "rawSchemas";
     static String family = "data";
+    static String inferenceNamespace2 = "tests2", inferenceNamespace = "tests";
+    static String inferenceTable = "testTable";
 
     public static void main(String[] args) throws IOException, Exception {
         HbaseOperations ops = new HbaseOperations();
         //ops.deleteNamespace(namespace);
         //ops.deleteNamespace("tests_rawSchema_15551"+"11674769");
+        //TablePopulator populator =new TablePopulator(inferenceNamespace, "testTable", 2, 10);
+        boolean populate = false;
+        String nmspace = inferenceNamespace2;
+        //String nmspace = inferenceNamespace;
         
-        ops.createNamespace(namespace);
-        ops.createTable(namespace, table, (new String[]{family}));
-        String inferenceNamespace = "tests";
-        Date date = new Date();
-        String newNamespace = inferenceNamespace + "_rawSchema_" + date.getTime();
-        ops.putData(namespace, table, inferenceNamespace, Bytes.toBytes(family), Bytes.toBytes(newNamespace), Bytes.toBytes(newNamespace));
-        RawSchema rawSchema = new RawSchema(inferenceNamespace, ops, newNamespace);
-        
-        long rawTime = rawSchema.getRawSchema();
-        rawSchema.rawToJSON();
-        
+        if (populate) {
+            int families = 4;
+            int rows = 10;
+            String table = nmspace+rows;
+            TablePopulator populator = new TablePopulator(nmspace, table, families, rows);
+        } else {
+            ops.createNamespace(namespace);
+            ops.createTable(namespace, table, (new String[]{family}));
+
+            Date date = new Date();
+            String newNamespace = nmspace + "_rawSchema_" + date.getTime();
+            ops.putData(namespace, table, nmspace, Bytes.toBytes(family), Bytes.toBytes(newNamespace), Bytes.toBytes(newNamespace));
+            RawSchema rawSchema = new RawSchema(nmspace, ops, newNamespace);
+
+            long rawTime = rawSchema.getRawSchema();
+            System.out.println(rawTime);
+            String rawToJSON = rawSchema.rawToJSON(); 
+            System.out.println(rawToJSON);
+        }
 
         //short result = ops.createNamespace(namespace);
         //System.out.println(result);
@@ -102,7 +116,8 @@ public class hbase {
         //Cell cell = clist.get(0);
         //NavigableMap<byte[], byte[]> familyMap = result2.getFamilyMap(Bytes.toBytes("dados"));
         //List<Cell> columnCells = result2.getColumnCells(Bytes.toBytes("dados"), Bytes.toBytes("estado"));
-        /*char teste = '9';
+        /*
+        char teste = '9';
         Bytes.toBytes(teste);
         int tint = 57;
         Bytes.toBytes(tint);
