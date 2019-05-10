@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.hbase;
+package HbaseSchemaInference.model;
 
 import HbaseSchemaInference.control.HbaseOperations;
 import java.util.ArrayList;

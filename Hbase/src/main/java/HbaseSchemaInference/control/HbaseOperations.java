@@ -77,14 +77,14 @@ public class HbaseOperations {
             admin = connection.getAdmin();
 
         } catch (IOException ex) {
-            
+
             return -1;
 
         }
 
         try {
             admin.getNamespaceDescriptor(name);
-            
+
             return 1;
         } catch (IOException ex) {
             try {
@@ -94,7 +94,7 @@ public class HbaseOperations {
                 Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
-        
+
         return 0;
 
     }
@@ -110,12 +110,12 @@ public class HbaseOperations {
      */
     public short createTable(String namespace, String name, String[] familyName) {
         Admin admin = null;
-        
+
         try {
             admin = connection.getAdmin();
 
         } catch (IOException ex) {
-            
+
             return -1;
 
         }
@@ -124,7 +124,7 @@ public class HbaseOperations {
             admin.getNamespaceDescriptor(namespace);
 
         } catch (IOException ex) {
-            
+
             return -2;
         }
 
@@ -132,7 +132,6 @@ public class HbaseOperations {
 
         try {
             admin.getTableDescriptor(tableName);
-            
 
             return 1;
         } catch (IOException ex) {
@@ -147,10 +146,9 @@ public class HbaseOperations {
         try {
             admin.createTable(desc);
         } catch (IOException ex) {
-            
+
             return -3;
         }
-        
 
         return 0;
 
@@ -174,7 +172,7 @@ public class HbaseOperations {
 
         } catch (IOException ex) {
             Logger.getLogger(HbaseOperations.class.getName()).log(Level.SEVERE, null, ex);
-            
+
             return -1;
 
         }
@@ -183,7 +181,7 @@ public class HbaseOperations {
             admin.getNamespaceDescriptor(namespace);
 
         } catch (IOException ex) {
-            
+
             return -2;
         }
 
@@ -192,7 +190,7 @@ public class HbaseOperations {
         try {
             desc = admin.getTableDescriptor(tableName);
         } catch (IOException ex) {
-            
+
             return -3;
         }
         boolean allFamilyExists = true;
@@ -204,16 +202,15 @@ public class HbaseOperations {
             }
         }
         if (allFamilyExists) {
-            
+
             return 1;
         }
         try {
             admin.modifyTable(tableName, desc);
         } catch (IOException ex) {
-            
+
             return -4;
         }
-
 
         return 0;
 
@@ -227,7 +224,7 @@ public class HbaseOperations {
     
      */
     public short putData(String namespace, String table, String row, byte[] family, byte[] column, byte[] value) {
-        
+
         TableName tableName = TableName.valueOf(namespace, table);
         byte[] rowName = Bytes.toBytes(row);
         Put p = new Put(rowName);
@@ -235,18 +232,17 @@ public class HbaseOperations {
         try {
             tableClass = connection.getTable(tableName);
         } catch (IOException ex) {
-            
+
             return -1;
         }
         p.addColumn(family, column, value);
         try {
             tableClass.put(p);
         } catch (IOException ex) {
-            
+
             return -2;
         }
 
-        
         return 0;
 
     }
@@ -259,7 +255,7 @@ public class HbaseOperations {
     
      */
     public short putArrayOfData(String namespace, String table, String row, ArrayList<PutData> data) {
-        
+
         TableName tableName = TableName.valueOf(namespace, table);
         byte[] rowName = Bytes.toBytes(row);
         Put p = new Put(rowName);
@@ -267,7 +263,7 @@ public class HbaseOperations {
         try {
             tableClass = connection.getTable(tableName);
         } catch (IOException ex) {
-            
+
             return -1;
         }
         for (PutData entry : data) {
@@ -276,11 +272,10 @@ public class HbaseOperations {
         try {
             tableClass.put(p);
         } catch (IOException ex) {
-            
+
             return -2;
         }
 
-        
         return 0;
 
     }
@@ -295,12 +290,12 @@ public class HbaseOperations {
      */
     public short deleteTable(String namespace, String table) {
         Admin admin = null;
-        
+
         try {
             admin = connection.getAdmin();
 
         } catch (IOException ex) {
-            
+
             return -1;
 
         }
@@ -309,7 +304,7 @@ public class HbaseOperations {
             admin.getNamespaceDescriptor(namespace);
 
         } catch (IOException ex) {
-           
+
             return -2;
         }
 
@@ -319,11 +314,10 @@ public class HbaseOperations {
             admin.disableTable(tableName);
             admin.deleteTable(tableName);
         } catch (IOException ex) {
-            
+
             return -3;
         }
 
-        
         return 0;
     }
 
@@ -337,12 +331,12 @@ public class HbaseOperations {
      */
     public short deleteNamespace(String namespace) {
         Admin admin = null;
-        
+
         try {
             admin = connection.getAdmin();
 
         } catch (IOException ex) {
-            
+
             return -1;
 
         }
@@ -351,7 +345,7 @@ public class HbaseOperations {
             namespaceDescriptor = admin.getNamespaceDescriptor(namespace);
 
         } catch (IOException ex) {
-            
+
             return -2;
         }
         String[] tables = this.getTables(namespace);
@@ -362,11 +356,10 @@ public class HbaseOperations {
         try {
             admin.deleteNamespace(namespace);
         } catch (IOException ex) {
-            
+
             return -3;
         }
 
-        
         return 0;
     }
 
@@ -376,12 +369,12 @@ public class HbaseOperations {
      */
     public String[] getTables(String namespace) {
         Admin admin = null;
-        
+
         try {
             admin = connection.getAdmin();
 
         } catch (IOException ex) {
-            
+
             return null;
 
         }
@@ -390,7 +383,7 @@ public class HbaseOperations {
             namespaceDescriptor = admin.getNamespaceDescriptor(namespace);
 
         } catch (IOException ex) {
-            
+
             return null;
         }
 
@@ -398,7 +391,7 @@ public class HbaseOperations {
         try {
             tables = admin.listTableDescriptorsByNamespace(namespace);
         } catch (IOException ex) {
-            
+
             return null;
         }
         String[] tableNames = new String[tables.length];
@@ -406,8 +399,6 @@ public class HbaseOperations {
             tableNames[i] = tables[i].getNameAsString().split(":")[1];
 
         }
-
-        
 
         return tableNames;
     }
@@ -417,12 +408,12 @@ public class HbaseOperations {
      */
     public String[] getFamilies(String namespace, String table) {
         Admin admin = null;
-        
+
         try {
             admin = connection.getAdmin();
 
         } catch (IOException ex) {
-            
+
             return null;
 
         }
@@ -432,7 +423,7 @@ public class HbaseOperations {
         try {
             desc = admin.getTableDescriptor(tableName);
         } catch (IOException ex) {
-            
+
             return null;
         }
 
@@ -442,15 +433,11 @@ public class HbaseOperations {
             familyNames[j] = columnFamilies[j].getNameAsString();
         }
 
-        
-
         return familyNames;
     }
 
     public String[] getColumns(String namespace, String table, String family) {
         String[] columnNames = new String[0];
-
-        
 
         TableName tableName = TableName.valueOf(namespace, table);
 
@@ -458,7 +445,7 @@ public class HbaseOperations {
         try {
             table2 = connection.getTable(tableName);
         } catch (IOException ex) {
-           
+
             return null;
         }
         Scan scan = new Scan();
@@ -479,17 +466,14 @@ public class HbaseOperations {
                 columnNames = combine(columnNames, tempNames);
             }
         } catch (IOException ex) {
-            
+
             return null;
         }
-
-        
 
         return columnNames;
     }
 
     public ResultScanner getValuesScan(String namespace, String table, String family, String column) {
-        
 
         TableName tableName = TableName.valueOf(namespace, table);
 
@@ -497,7 +481,7 @@ public class HbaseOperations {
         try {
             table2 = connection.getTable(tableName);
         } catch (IOException ex) {
-            
+
             return null;
         }
         Scan scan = new Scan();
@@ -507,7 +491,7 @@ public class HbaseOperations {
             scanner = table2.getScanner(scan);
 
         } catch (IOException ex) {
-            
+
             return null;
         }
 
@@ -515,7 +499,6 @@ public class HbaseOperations {
     }
 
     public ResultScanner getTableScan(String namespace, String table) {
-        
 
         TableName tableName = TableName.valueOf(namespace, table);
 
@@ -523,7 +506,7 @@ public class HbaseOperations {
         try {
             table2 = connection.getTable(tableName);
         } catch (IOException ex) {
-            
+
             return null;
         }
         Scan scan = new Scan();
@@ -532,7 +515,7 @@ public class HbaseOperations {
             scanner = table2.getScanner(scan);
 
         } catch (IOException ex) {
-            
+
             return null;
         }
 
@@ -548,6 +531,37 @@ public class HbaseOperations {
         System.arraycopy(a, 0, result, 0, a.length);
         System.arraycopy(b, 0, result, a.length, b.length);
         return result;
+    }
+
+    public String[] getNamespaces(boolean clear, String[] management) {
+        Admin admin = null;
+
+        try {
+            admin = connection.getAdmin();
+
+        } catch (IOException ex) {
+
+            return new String[0];
+
+        }
+        NamespaceDescriptor[] namespaceDescriptor;
+        String[] namespaces;
+        try {
+            namespaceDescriptor = admin.listNamespaceDescriptors();
+            namespaces = new String[namespaceDescriptor.length];
+            int i = 0;
+            for (NamespaceDescriptor namespace : namespaceDescriptor) {
+                String name = namespace.getName();
+                if (!name.contains(management[3]) && !management[0].equals(name)) {
+                    namespaces[i] = namespace.getName();
+                    i++;
+                }
+            }
+            return namespaces;
+        } catch (IOException ex) {
+
+            return new String[0];
+        }
     }
 
 }

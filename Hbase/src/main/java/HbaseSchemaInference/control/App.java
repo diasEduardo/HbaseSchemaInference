@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.hbase;
+package HbaseSchemaInference.control;
 
 import HbaseSchemaInference.control.HbaseOperations;
 import HbaseSchemaInference.model.RawSchema;
+import HbaseSchemaInference.view.MainView;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLConnection;
@@ -50,19 +51,28 @@ import org.apache.tika.Tika;
  *
  * @author eduardo
  */
-public class hbase {
-
-    static String namespace = "hBaseSchemaInference";
-    static String table = "rawSchemas";
-    static String family = "data";
+public class App {
+    //hbase namespace, man table, man family, new namespace ident
+    static String[] manageNamespace = {"hBaseSchemaInference","rawSchemas","data","_rawSchema_"};
     static String inferenceNamespace2 = "tests2", inferenceNamespace = "tests";
     static String inferenceTable = "testTable";
-
-    public static void main(String[] args) throws IOException, Exception {
-        HbaseOperations ops = new HbaseOperations();
+    private  MainView view;
+    private  HbaseOperations ops;
+    
+    public static void main(String[] args) {
+        new App();
+    }
+    
+    public App()  {
+        ops = new HbaseOperations();
+        ops.createNamespace(manageNamespace[0]);
+        ops.createTable(manageNamespace[0], manageNamespace[1], (new String[]{manageNamespace[2]}));
+        view = new MainView(this);
+        view.setVisible(true);
         //ops.deleteNamespace(namespace);
         //ops.deleteNamespace("tests_rawSchema_15551"+"11674769");
         //TablePopulator populator =new TablePopulator(inferenceNamespace, "testTable", 2, 10);
+        /*
         boolean populate = false;
         String nmspace = inferenceNamespace2;
         //String nmspace = inferenceNamespace;
@@ -73,11 +83,10 @@ public class hbase {
             String table = nmspace+rows;
             TablePopulator populator = new TablePopulator(nmspace, table, families, rows);
         } else {
-            ops.createNamespace(namespace);
-            ops.createTable(namespace, table, (new String[]{family}));
+            
 
             Date date = new Date();
-            String newNamespace = nmspace + "_rawSchema_" + date.getTime();
+            String newNamespace = nmspace + manageNamespace[3] + date.getTime();
             ops.putData(namespace, table, nmspace, Bytes.toBytes(family), Bytes.toBytes(newNamespace), Bytes.toBytes(newNamespace));
             RawSchema rawSchema = new RawSchema(nmspace, ops, newNamespace);
 
@@ -116,7 +125,7 @@ public class hbase {
         //Cell cell = clist.get(0);
         //NavigableMap<byte[], byte[]> familyMap = result2.getFamilyMap(Bytes.toBytes("dados"));
         //List<Cell> columnCells = result2.getColumnCells(Bytes.toBytes("dados"), Bytes.toBytes("estado"));
-        /*
+        
         char teste = '9';
         Bytes.toBytes(teste);
         int tint = 57;
@@ -152,6 +161,10 @@ public class hbase {
         
         System.out.println(Bytes.toDouble(d));
          */
+    }
+    
+    public String[] getNamespaces() {
+        return ops.getNamespaces(true,manageNamespace);
     }
 
     public static void scan_all(String table, Configuration conf) throws IOException {
@@ -551,6 +564,8 @@ public class hbase {
         }
         return true;
     }
+
+    
 
 }
 
