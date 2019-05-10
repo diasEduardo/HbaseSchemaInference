@@ -6,6 +6,9 @@
 package HbaseSchemaInference.view;
 
 import HbaseSchemaInference.control.App;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Date;
 import javax.swing.JList;
 
 /**
@@ -15,6 +18,7 @@ import javax.swing.JList;
 public class MainView extends javax.swing.JFrame {
 
     private App app;
+    private String[] schemas;
 
     public MainView() {
         initComponents();
@@ -22,9 +26,10 @@ public class MainView extends javax.swing.JFrame {
 
     public MainView(App main) {
         app = main;
-        
+
         initComponents();
         getNamespaces();
+
     }
 
     /**
@@ -36,23 +41,30 @@ public class MainView extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        AvaliableNamespaces = new javax.swing.JList<>();
+        namespacesScroll = new javax.swing.JScrollPane();
+        avaliableNamespaces = new javax.swing.JList<>();
         jLabel1 = new javax.swing.JLabel();
         refreshNamespaces = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 24), new java.awt.Dimension(0, 24), new java.awt.Dimension(32767, 24));
         jSeparator1 = new javax.swing.JSeparator();
-        refreshNamespaces1 = new javax.swing.JButton();
+        refreshSchemes = new javax.swing.JButton();
         jSeparator2 = new javax.swing.JSeparator();
         jLabel2 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        AvaliableNamespaces1 = new javax.swing.JList<>();
+        schemasScroll = new javax.swing.JScrollPane();
+        AvaliableSchemes = new javax.swing.JList<>();
         jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        namespaceLabel = new javax.swing.JLabel();
+        newScheme = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jScrollPane1.setViewportView(AvaliableNamespaces);
+        avaliableNamespaces.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "testes" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        avaliableNamespaces.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        namespacesScroll.setViewportView(avaliableNamespaces);
 
         jLabel1.setText("Namespaces disponiveis:");
 
@@ -62,15 +74,20 @@ public class MainView extends javax.swing.JFrame {
                 refreshNamespacesMouseReleased(evt);
             }
         });
+        refreshNamespaces.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                refreshNamespacesActionPerformed(evt);
+            }
+        });
 
         jSeparator1.setForeground(new java.awt.Color(0, 0, 0));
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator1.setFont(new java.awt.Font("Dialog", 0, 24)); // NOI18N
 
-        refreshNamespaces1.setText("Atualizar");
-        refreshNamespaces1.addMouseListener(new java.awt.event.MouseAdapter() {
+        refreshSchemes.setText("Atualizar");
+        refreshSchemes.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                refreshNamespaces1MouseReleased(evt);
+                refreshSchemesMouseReleased(evt);
             }
         });
 
@@ -80,11 +97,23 @@ public class MainView extends javax.swing.JFrame {
 
         jLabel2.setText("Esquemas:");
 
-        jScrollPane2.setViewportView(AvaliableNamespaces1);
+        schemasScroll.setViewportView(AvaliableSchemes);
 
         jLabel3.setText("Namespace: ");
 
-        jLabel4.setText("N");
+        namespaceLabel.setText("N");
+
+        newScheme.setText("Gerar Novo");
+        newScheme.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                newSchemeMouseReleased(evt);
+            }
+        });
+        newScheme.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                newSchemeActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -93,75 +122,78 @@ public class MainView extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(42, 42, 42)
-                        .addComponent(refreshNamespaces))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(20, 20, 20)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(namespacesScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(refreshNamespaces)
+                        .addGap(38, 38, 38)))
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(30, 30, 30)
-                        .addComponent(refreshNamespaces1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(12, 12, 12)
+                        .addComponent(refreshSchemes)
+                        .addGap(22, 22, 22)
+                        .addComponent(newScheme))
+                    .addComponent(schemasScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(156, 156, 156))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addGap(26, 26, 26)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(26, 26, 26)
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel4))
-                    .addComponent(jLabel2))
+                        .addComponent(namespaceLabel))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(81, 81, 81)
+                        .addComponent(jLabel2)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(51, 51, 51)
+                .addComponent(jSeparator2)
+                .addGap(31, 31, 31))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2))
+                .addGap(3, 3, 3)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(namespaceLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(schemasScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(refreshSchemes)
+                    .addComponent(newScheme))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(51, 51, 51)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(51, 51, 51))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jSeparator1)
+                        .addGap(31, 31, 31))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(51, 51, 51)
-                                .addComponent(jSeparator2)
-                                .addGap(6, 6, 6))
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel1))
-                                .addGap(3, 3, 3)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel3)
-                                    .addComponent(jLabel4))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                        .addComponent(refreshNamespaces1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(51, 51, 51)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jScrollPane1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(26, 26, 26))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jSeparator1)
-                                .addGap(6, 6, 6)))
-                        .addComponent(refreshNamespaces)))
-                .addContainerGap())
+                        .addComponent(namespacesScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(refreshNamespaces)
+                        .addContainerGap(25, Short.MAX_VALUE))))
         );
 
         pack();
@@ -171,30 +203,95 @@ public class MainView extends javax.swing.JFrame {
         getNamespaces();
     }//GEN-LAST:event_refreshNamespacesMouseReleased
 
-    private void refreshNamespaces1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_refreshNamespaces1MouseReleased
+    private void refreshSchemesMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_refreshSchemesMouseReleased
+        if (refreshSchemes.isEnabled()) {
+            selectNamespace();
+        }
+    }//GEN-LAST:event_refreshSchemesMouseReleased
+
+    private void refreshNamespacesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshNamespacesActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_refreshNamespaces1MouseReleased
+    }//GEN-LAST:event_refreshNamespacesActionPerformed
+
+    private void newSchemeMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_newSchemeMouseReleased
+        if (newScheme.isEnabled()) {
+
+        }
+    }//GEN-LAST:event_newSchemeMouseReleased
+
+    private void newSchemeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newSchemeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_newSchemeActionPerformed
+
+    private void selectNamespace() {
+        if (avaliableNamespaces.getSelectedIndex() >= 0) {
+            String selected = avaliableNamespaces.getSelectedValue();
+            namespaceLabel.setText(selected);
+            getSchemesList(selected);
+        }
+    }
+
+    private void getSchemesList(String namespace) {
+        String[] namespaces = app.getSchemes(namespace);
+        schemas = namespaces;
+        for (int i = 0; i < namespaces.length; i++) {
+            String[] split = namespaces[i].split("_");
+            long time = Long.parseLong(split[split.length-1]);
+            Date date = new Date(time);
+            namespaces[i] = date.toString();
+        }
+        AvaliableSchemes = new JList(namespaces);
+        AvaliableSchemes.setSelectedIndex(-1);
+        schemasScroll.setViewportView(AvaliableSchemes);
+        refreshSchemes.setEnabled(true);
+        newScheme.setEnabled(true);
+    }
 
     private void getNamespaces() {
         String[] namespaces = app.getNamespaces();
-        AvaliableNamespaces = new JList(namespaces);
-        jScrollPane1.setViewportView(AvaliableNamespaces);
+        avaliableNamespaces = new JList(namespaces);
+        avaliableNamespaces.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                selectNamespace();
+            }
+        });
+        avaliableNamespaces.setSelectedIndex(-1);
+        namespacesScroll.setViewportView(avaliableNamespaces);
+        clearSchemesList();
+
+    }
+
+    private void clearSchemeView() {
+
+    }
+
+    private void clearSchemesList() {
+        AvaliableSchemes = new JList();
+        avaliableNamespaces.setSelectedIndex(-1);
+        schemasScroll.setViewportView(AvaliableSchemes);
+        namespaceLabel.setText("");
+        refreshSchemes.setEnabled(false);
+        newScheme.setEnabled(false);
+        schemas = new String[0];
+        clearSchemeView();
+
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JList<String> AvaliableNamespaces;
-    private javax.swing.JList<String> AvaliableNamespaces1;
+    private javax.swing.JList<String> AvaliableSchemes;
+    private javax.swing.JList<String> avaliableNamespaces;
     private javax.swing.Box.Filler filler1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JLabel namespaceLabel;
+    private javax.swing.JScrollPane namespacesScroll;
+    private javax.swing.JButton newScheme;
     private javax.swing.JButton refreshNamespaces;
-    private javax.swing.JButton refreshNamespaces1;
+    private javax.swing.JButton refreshSchemes;
+    private javax.swing.JScrollPane schemasScroll;
     // End of variables declaration//GEN-END:variables
 }

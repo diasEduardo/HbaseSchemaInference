@@ -166,6 +166,9 @@ public class App {
     public String[] getNamespaces() {
         return ops.getNamespaces(true,manageNamespace);
     }
+    public String[] getSchemes(String namespace) {
+        return ops.getSchemes(manageNamespace[0],manageNamespace[1],manageNamespace[2],namespace);
+    }
 
     public static void scan_all(String table, Configuration conf) throws IOException {
         Connection connection = ConnectionFactory.createConnection();
@@ -564,6 +567,8 @@ public class App {
         }
         return true;
     }
+
+    
 
     
 

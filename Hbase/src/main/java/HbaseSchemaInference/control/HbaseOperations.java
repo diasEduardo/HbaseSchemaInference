@@ -31,6 +31,9 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.filter.BinaryComparator;
+import org.apache.hadoop.hbase.filter.CompareFilter;
+import org.apache.hadoop.hbase.filter.RowFilter;
 import org.apache.hadoop.hbase.security.User;
 import org.apache.hadoop.hbase.util.Bytes;
 
@@ -562,6 +565,43 @@ public class HbaseOperations {
 
             return new String[0];
         }
+    }
+
+    String[] getSchemes(String managementNamespace, String managementTable, String managementFamily, String namespace) {
+        String[] namespaceNames = new String[0];
+
+        TableName tableName = TableName.valueOf(managementNamespace, managementTable);
+
+        Table table2 = null;
+        try {
+            table2 = connection.getTable(tableName);
+        } catch (IOException ex) {
+
+            return null;
+        }
+        Scan scan = new Scan();
+        scan.addFamily(Bytes.toBytes(managementFamily));
+        scan.setFilter(new RowFilter(CompareFilter.CompareOp.EQUAL, new BinaryComparator(Bytes.toBytes(namespace))));
+        try {
+            ResultScanner scanner = table2.getScanner(scan);
+            for (Result result2 = scanner.next(); result2 != null; result2 = scanner.next()) {
+                List<Cell> family_cells = result2.listCells();
+                String[] tempNames = new String[family_cells.size()];
+                int i = 0;
+                for (Cell family_cell : result2.listCells()) {
+                    byte[] rowArray = family_cell.getRowArray();
+                    byte[] column = Arrays.copyOfRange(rowArray, family_cell.getQualifierOffset(), family_cell.getQualifierOffset() + family_cell.getQualifierLength());
+                    tempNames[i] = Bytes.toString(column);
+                    i++;
+                }
+                namespaceNames = combine(namespaceNames, tempNames);
+            }
+        } catch (IOException ex) {
+
+            return null;
+        }
+
+        return namespaceNames;
     }
 
 }
