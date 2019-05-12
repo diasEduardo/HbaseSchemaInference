@@ -6,6 +6,8 @@
 package HbaseSchemaInference.model;
 
 import HbaseSchemaInference.control.HbaseOperations;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +19,9 @@ import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -254,155 +259,168 @@ public class RawSchema {
 
     public String rawToJSON() {
         String[] tables = ops.getTables(newNamespace);
-        String schema = "\"$schema\": \"http://json-schema.org/draft-07/schema#\",\n"
-                + "  \"definitions\": {\n"
-                + "    \"long\": {\n"
-                + "      \"description\": \"Representation of a long number\",\n"
-                + "      \"type\": \"number\",\n"
-                + "      \"minimum\": -2147483648,\n"
-                + "      \"maximum\": 2147483647\n"
-                + "    },\n"
-                + "    \"double\": {\n"
-                + "      \"description\": \"Representation of a double number\",\n"
-                + "      \"type\": \"number\",\n"
-                + "      \"minimum\": -1.7E+308,\n"
-                + "      \"maximum\": 1.7E+308\n"
-                + "    },\n"
-                + "    \"float\": {\n"
-                + "      \"description\": \"Representation of a float number\",\n"
-                + "      \"type\": \"number\",\n"
-                + "      \"minimum\": 3.4E-38,\n"
-                + "      \"maximum\": 3.4E+38\n"
-                + "    },\n"
-                + "    \"byte\": {\n"
-                + "      \"description\": \"Representation of a byte\",\n"
-                + "      \"type\": \"number\",\n"
-                + "      \"minimum\": -128,\n"
-                + "      \"maximum\": 127\n"
-                + "    },\n"
-                + "    \"blob\": {\n"
-                + "      \"description\": \"Representation of a binary large object file\",\n"
-                + "      \"type\": \"string\",\n"
-                + "      \"minLength\": 2\n"
-                + "    },\n"
-                + "    \"short\": {\n"
-                + "      \"description\": \"Representation of a short number\",\n"
-                + "      \"type\": \"number\",\n"
-                + "      \"minimum\": -32768,\n"
-                + "      \"maximum\": 32767\n"
-                + "    },\n"
-                + "      \"char\": {\n"
-                + "      \"description\": \"Representation of a char\",\n"
-                + "      \"type\": \"string\",\n"
-                + "      \"minLength\": 1,\n"
-                + "      \"minLength\": 1\n"
-                + "    },\n"
-                + "      \"string\": {\n"
-                + "      \"description\": \"Representation of a string\",\n"
-                + "      \"type\": \"string\"\n"
-                + "    },\n"
-                + "      \n"
-                + "      \"integer\": {\n"
-                + "      \"description\": \"Representation of a integer number\",\n"
-                + "      \"type\": \"integer\"\n"
-                + "    },  \n"
-                + "      \"boolean\": {\n"
-                + "      \"description\": \"Representation of a boolean\",\n"
-                + "      \"type\": \"boolean\"\n"
+        String schema = "\"$schema\": \"http://json-schema.org/draft-07/schema#\","
+                + "  \"definitions\": {"
+                + "    \"long\": {"
+                + "      \"description\": \"Representation of a long number\","
+                + "      \"type\": \"number\","
+                + "      \"minimum\": -2147483648,"
+                + "      \"maximum\": 2147483647"
                 + "    },"
-                + "  },\n"
+                + "    \"double\": {"
+                + "      \"description\": \"Representation of a double number\","
+                + "      \"type\": \"number\","
+                + "      \"minimum\": -1.7E+308,"
+                + "      \"maximum\": 1.7E+308"
+                + "    },"
+                + "    \"float\": {"
+                + "      \"description\": \"Representation of a float number\","
+                + "      \"type\": \"number\","
+                + "      \"minimum\": 3.4E-38,"
+                + "      \"maximum\": 3.4E+38"
+                + "    },"
+                + "    \"byte\": {"
+                + "      \"description\": \"Representation of a byte\","
+                + "      \"type\": \"number\","
+                + "      \"minimum\": -128,"
+                + "      \"maximum\": 127"
+                + "    },"
+                + "    \"blob\": {"
+                + "      \"description\": \"Representation of a binary large object file\","
+                + "      \"type\": \"string\","
+                + "      \"minLength\": 2"
+                + "    },"
+                + "    \"short\": {"
+                + "      \"description\": \"Representation of a short number\","
+                + "      \"type\": \"number\","
+                + "      \"minimum\": -32768,"
+                + "      \"maximum\": 32767"
+                + "    },"
+                + "      \"char\": {"
+                + "      \"description\": \"Representation of a char\","
+                + "      \"type\": \"string\","
+                + "      \"minLength\": 1,"
+                + "      \"minLength\": 1"
+                + "    },"
+                + "      \"string\": {"
+                + "      \"description\": \"Representation of a string\","
+                + "      \"type\": \"string\""
+                + "    },"
+                + "      "
+                + "      \"integer\": {"
+                + "      \"description\": \"Representation of a integer number\","
+                + "      \"type\": \"integer\""
+                + "    },  "
+                + "      \"boolean\": {"
+                + "      \"description\": \"Representation of a boolean\","
+                + "      \"type\": \"boolean\""
+                + "    },"
+                + "  },"
                 + ""
-                + "  \"$id\": \"namespace-" + namespace + "\",\n"
-                + "  \"description\": \"Representation of a hbase namespace\",\n"
-                + "  \"type\": \"object\",\n"
-                + "\"properties\": {\n";
-        for (String table : tables) {
-            schema += " \"" + table + "\": {\n"
-                    + "     \"description\": \"Representation of a hbase table\",\n"
-                    + "     \"type\": \"object\",\n"
-                    + "     \"properties\": {\n";
-            try {
-                ResultScanner scanner = ops.getTableScan(newNamespace, table);
-                for (Result result2 = scanner.next(); result2 != null; result2 = scanner.next()) {
-                    List<Cell> family_cells = result2.listCells();
-                    String family = "";
-                    for (Cell family_cell : result2.listCells()) {
+                + "  \"$id\": \"namespace-" + namespace + "\","
+                + "  \"description\": \"Representation of a hbase namespace\","
+                + "  \"type\": \"object\","
+                + "\"properties\": {";
+        if (tables != null) {
+            for (String table : tables) {
+                schema += " \"" + table + "\": {"
+                        + "     \"description\": \"Representation of a hbase table\","
+                        + "     \"type\": \"object\","
+                        + "     \"properties\": {";
+                try {
+                    ResultScanner scanner = ops.getTableScan(newNamespace, table);
+                    for (Result result2 = scanner.next(); result2 != null; result2 = scanner.next()) {
+                        List<Cell> family_cells = result2.listCells();
+                        String family = "";
+                        for (Cell family_cell : result2.listCells()) {
 
-                        byte[] rowArray = family_cell.getRowArray();
-                        byte[] fam = Arrays.copyOfRange(rowArray, family_cell.getFamilyOffset(),
-                                family_cell.getFamilyOffset() + family_cell.getFamilyLength());
-                        String temp = Bytes.toString(fam);
-                        if (!temp.equals(family)) {
-                            if (family != "") {
-                                schema += "}\n"
-                                        + "},\n ";
+                            byte[] rowArray = family_cell.getRowArray();
+                            byte[] fam = Arrays.copyOfRange(rowArray, family_cell.getFamilyOffset(),
+                                    family_cell.getFamilyOffset() + family_cell.getFamilyLength());
+                            String temp = Bytes.toString(fam);
+                            if (!temp.equals(family)) {
+                                if (family != "") {
+                                    schema += "}"
+                                            + "}, ";
+                                }
+                                family = temp;
+                                schema += "        \"" + family + "\": {"
+                                        + "          \"description\": \"Representation of a hbase family\","
+                                        + "          \"type\": \"object\","
+                                        + "          \"properties\": {";
                             }
-                            family = temp;
-                            schema += "        \"" + family + "\": {\n"
-                                    + "          \"description\": \"Representation of a hbase family\",\n"
-                                    + "          \"type\": \"object\",\n"
-                                    + "          \"properties\": {";
-                        }
-                        byte[] col = Arrays.copyOfRange(rowArray, family_cell.getQualifierOffset(),
-                                family_cell.getQualifierOffset() + family_cell.getQualifierLength());
-                        String column = Bytes.toString(col);
-                        schema += "        \"" + column + "\": ";
+                            byte[] col = Arrays.copyOfRange(rowArray, family_cell.getQualifierOffset(),
+                                    family_cell.getQualifierOffset() + family_cell.getQualifierLength());
+                            String column = Bytes.toString(col);
+                            schema += "        \"" + column + "\": ";
 
-                        ArrayList<String> types = new ArrayList<String>();
-                        String ref = "\"$ref\": \"#/definitions/";
+                            ArrayList<String> types = new ArrayList<String>();
+                            String ref = "\"$ref\": \"#/definitions/";
 
-                        byte[] type = Arrays.copyOfRange(rowArray, family_cell.getValueOffset() + 5,
-                                family_cell.getValueOffset() + family_cell.getValueLength());
-                        if ((type[1] & booleanNum) != 0) {
-                            types.add(ref + "boolean\"");
-                        } else if ((type[1] & byteNum) != 0) {
-                            types.add(ref + "byte\"");
-                        }
-                        if ((type[1] & stringNum) != 0) {
-                            types.add(ref + "string\"");
-                        }
-                        if ((type[1] & shortNum) != 0) {
-                            types.add(ref + "short\"");
-                        }
-                        if ((type[1] & charNum) != 0) {
-                            types.add(ref + "char\"");
-                        }
-                        if ((type[1] & floatNum) != 0) {
-                            types.add(ref + "float\"");
-                        }
-                        if ((type[1] & integerNum) != 0) {
-                            types.add(ref + "integer\"");
-                        }
-                        if ((type[0] & doubleNum) != 0) {
-                            types.add(ref + "double\"");
-                        }
-                        if ((type[0] & longNum) != 0) {
-                            types.add(ref + "long\"");
-                        }
-                        if ((type[0] & blobNum) != 0) {
-                            types.add(ref + "blob\"");
-                        }
-                        if (types.size() == 1) {
-                            schema += " {\n" + types.get(0) + " },\n";
-                        } else {
-                            String choices = "";
-                            for (int i = 0; i < types.size(); i++) {
-                                choices += "{" + types.get(i) + "},\n";
+                            byte[] type = Arrays.copyOfRange(rowArray, family_cell.getValueOffset() + 5,
+                                    family_cell.getValueOffset() + family_cell.getValueLength());
+                            if ((type[1] & booleanNum) != 0) {
+                                types.add(ref + "boolean\"");
+                            } else if ((type[1] & byteNum) != 0) {
+                                types.add(ref + "byte\"");
                             }
-                            schema += " {\"anyOf\":[\n" + choices + " \n]\n},\n";
+                            if ((type[1] & stringNum) != 0) {
+                                types.add(ref + "string\"");
+                            }
+                            if ((type[1] & shortNum) != 0) {
+                                types.add(ref + "short\"");
+                            }
+                            if ((type[1] & charNum) != 0) {
+                                types.add(ref + "char\"");
+                            }
+                            if ((type[1] & floatNum) != 0) {
+                                types.add(ref + "float\"");
+                            }
+                            if ((type[1] & integerNum) != 0) {
+                                types.add(ref + "integer\"");
+                            }
+                            if ((type[0] & doubleNum) != 0) {
+                                types.add(ref + "double\"");
+                            }
+                            if ((type[0] & longNum) != 0) {
+                                types.add(ref + "long\"");
+                            }
+                            if ((type[0] & blobNum) != 0) {
+                                types.add(ref + "blob\"");
+                            }
+                            if (types.size() == 1) {
+                                schema += " {" + types.get(0) + " },";
+                            } else {
+                                String choices = "";
+                                for (int i = 0; i < types.size(); i++) {
+                                    choices += "{" + types.get(i) + "},";
+                                }
+                                schema += " {\"anyOf\":[" + choices + " ]},";
+                            }
                         }
                     }
-                }
 
-            } catch (IOException ex) {
-                Logger.getLogger(RawSchema.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(RawSchema.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                schema += "}"
+                        + "},"
+                        + "},";
             }
-            schema += "}\n"
-                    + "},\n "
-                    + "},\n ";
+             schema += "} ";
         }
-        schema += "}\n}\n ";
-        return "{"+schema+"}";
+        schema += "} ";
+        schema = "{" + schema + "}";
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JSONParser parser = new JSONParser();
+        JSONObject json = null;
+        try {
+            json = (JSONObject) parser.parse(schema);
+        } catch (ParseException ex) {
+            Logger.getLogger(RawSchema.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return gson.toJson(json);
 
     }
 

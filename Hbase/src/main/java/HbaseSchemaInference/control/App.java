@@ -52,18 +52,19 @@ import org.apache.tika.Tika;
  * @author eduardo
  */
 public class App {
+
     //hbase namespace, man table, man family, new namespace ident
-    static String[] manageNamespace = {"hBaseSchemaInference","rawSchemas","data","_rawSchema_"};
+    static String[] manageNamespace = {"hBaseSchemaInference", "rawSchemas", "data", "_rawSchema_"};
     static String inferenceNamespace2 = "tests2", inferenceNamespace = "tests";
     static String inferenceTable = "testTable";
-    private  MainView view;
-    private  HbaseOperations ops;
-    
+    private MainView view;
+    private HbaseOperations ops;
+
     public static void main(String[] args) {
         new App();
     }
-    
-    public App()  {
+
+    public App() {
         ops = new HbaseOperations();
         ops.createNamespace(manageNamespace[0]);
         ops.createTable(manageNamespace[0], manageNamespace[1], (new String[]{manageNamespace[2]}));
@@ -162,12 +163,19 @@ public class App {
         System.out.println(Bytes.toDouble(d));
          */
     }
-    
+
     public String[] getNamespaces() {
-        return ops.getNamespaces(true,manageNamespace);
+        return ops.getNamespaces(true, manageNamespace);
     }
+
     public String[] getSchemes(String namespace) {
-        return ops.getSchemes(manageNamespace[0],manageNamespace[1],manageNamespace[2],namespace);
+        return ops.getSchemes(manageNamespace[0], manageNamespace[1], manageNamespace[2], namespace);
+    }
+
+    public String getSchema(String namespace) {
+        String[] split = namespace.split("_");
+        RawSchema rawSchema = new RawSchema(split[0], ops, namespace);
+        return rawSchema.rawToJSON();
     }
 
     public static void scan_all(String table, Configuration conf) throws IOException {
@@ -567,10 +575,6 @@ public class App {
         }
         return true;
     }
-
-    
-
-    
 
 }
 
