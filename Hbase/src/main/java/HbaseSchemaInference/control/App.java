@@ -11,6 +11,7 @@ import HbaseSchemaInference.view.MainView;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -72,96 +73,6 @@ public class App {
         view.setVisible(true);
         //ops.deleteNamespace(namespace);
         //ops.deleteNamespace("tests_rawSchema_15551"+"11674769");
-        //TablePopulator populator =new TablePopulator(inferenceNamespace, "testTable", 2, 10);
-        /*
-        boolean populate = false;
-        String nmspace = inferenceNamespace2;
-        //String nmspace = inferenceNamespace;
-        
-        if (populate) {
-            int families = 4;
-            int rows = 10;
-            String table = nmspace+rows;
-            TablePopulator populator = new TablePopulator(nmspace, table, families, rows);
-        } else {
-            
-
-            Date date = new Date();
-            String newNamespace = nmspace + manageNamespace[3] + date.getTime();
-            ops.putData(namespace, table, nmspace, Bytes.toBytes(family), Bytes.toBytes(newNamespace), Bytes.toBytes(newNamespace));
-            RawSchema rawSchema = new RawSchema(nmspace, ops, newNamespace);
-
-            long rawTime = rawSchema.getRawSchema();
-            System.out.println(rawTime);
-            String rawToJSON = rawSchema.rawToJSON(); 
-            System.out.println(rawToJSON);
-        }
-
-        //short result = ops.createNamespace(namespace);
-        //System.out.println(result);
-        //short tableRes = ops.createTable(namespace, table, (new String[]{family, "family2"}));
-        //System.out.println(tableRes);
-        //short tableRes1 = ops.alterFamilies(namespace, table, (new String[]{"family3"}));
-        //System.out.println(tableRes1);
-        //short putRes = ops.putData(namespace, table, "test1", Bytes.toBytes(family), Bytes.toBytes("nome"), Bytes.toBytes("eduardo"));
-        ///System.out.println(putRes);
-        //TablePopulator populator =new TablePopulator(namespace, table, 2, 10);
-        //
-        //System.setProperty("file.encoding", "UTF-8");
-        //System.setProperty("encoding", "UTF-8");
-        //String namespace = "default";
-        //String table = "pessoas";
-        //String family = "teste";//"dados";
-        //Configuration conf = HBaseConfiguration.create();
-        //typeTests(namespace, table, family, conf);
-        //dataTests(namespace, table, family, conf);
-        //binaryTests(namespace, table, family, conf);
-        //get_tables_and_families(namespace, conf);
-        // scan_all(table, conf);
-        //get_columns_and_values(table, family, conf);
-        //get_columns(table, family, conf);
-        //scan.setScanMetricsEnabled(true);
-        // ScanMetrics scanMetrics = scanner.getScanMetrics();
-        //List<Cell> clist = result2.listCells();
-        //Cell cell = clist.get(0);
-        //NavigableMap<byte[], byte[]> familyMap = result2.getFamilyMap(Bytes.toBytes("dados"));
-        //List<Cell> columnCells = result2.getColumnCells(Bytes.toBytes("dados"), Bytes.toBytes("estado"));
-        
-        char teste = '9';
-        Bytes.toBytes(teste);
-        int tint = 57;
-        Bytes.toBytes(tint);
-
-        byte[] str = Bytes.toBytes("ç");
-        System.out.println(teste + "bin " + Bytes.toStringBinary(str));
-        System.out.println(tint + "bin " + new String(str, "UTF-8"));
-        System.out.println(tint + "bin " + new String(str, encode));
-        System.out.println(tint + "bin " + Bytes.toString(str));
-        str = Bytes.toBytes('ç');
-        System.out.println(teste + "bin " + Bytes.toStringBinary(str));
-        System.out.println(tint + "bin " + new String(str, "UTF-8"));
-        System.out.println(tint + "bin " + new String(str, encode));
-        System.out.println(tint + "bin " + Bytes.toString(str));
-         
-        
-        byte[] str = Bytes.toBytes(lorem_ipsum);
-        long init = System.currentTimeMillis();
-        boolean valid = isUtf8Valid(str);
-        long fim = System.currentTimeMillis();
-        long diffInMillies = Math.abs(init - fim);
-        long diff = TimeUnit.MILLISECONDS.toSeconds(diffInMillies);
-        System.out.println("\nlen - " + str.length + "\nvalid - " + valid + "\ntime - " + diffInMillies);
-         */
- /*
-        int a = 2139127936;
-        byte[] b = Bytes.toBytes(a);
-        byte test = (byte) (b[1] >> 1);
-        System.out.println(Bytes.toFloat(b));
-        long c = 9219133352956719344L;
-        byte[] d = Bytes.toBytes(c);
-        
-        System.out.println(Bytes.toDouble(d));
-         */
     }
 
     public String[] getNamespaces() {
@@ -174,8 +85,28 @@ public class App {
 
     public String getSchema(String namespace) {
         String[] split = namespace.split("_");
-        RawSchema rawSchema = new RawSchema(split[0], ops, namespace);
+        RawSchema rawSchema = new RawSchema(split[0], ops, namespace, this);
         return rawSchema.rawToJSON();
+    }
+
+    public void newSchema(String namespace) {
+        Date date = new Date();
+        String newNamespace = namespace + manageNamespace[3] + date.getTime();
+        ops.putData(manageNamespace[0], manageNamespace[1], namespace, Bytes.toBytes(manageNamespace[2]), Bytes.toBytes(newNamespace), Bytes.toBytes(newNamespace));
+        RawSchema rawSchema = new RawSchema(namespace, ops, newNamespace, this);
+        new Thread() {
+
+            @Override
+            public void run() {
+                long rawTime = rawSchema.getRawSchema();
+                view.newSchema(date, rawTime);
+            }
+        }.start();
+
+    }
+
+    public void updateStatus(String text) {
+        view.updateStatus(text);
     }
 
     public static void scan_all(String table, Configuration conf) throws IOException {

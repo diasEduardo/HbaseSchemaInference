@@ -16,6 +16,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -73,6 +74,7 @@ public class MainView extends javax.swing.JFrame {
         exportScheme = new javax.swing.JButton();
         jSeparator3 = new javax.swing.JSeparator();
         copyScheme = new javax.swing.JButton();
+        statusLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -173,6 +175,8 @@ public class MainView extends javax.swing.JFrame {
             }
         });
 
+        statusLabel.setText("Status:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -210,17 +214,19 @@ public class MainView extends javax.swing.JFrame {
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(refreshNamespaces)
-                                .addGap(39, 39, 39)))
+                                .addGap(38, 38, 38)))
+                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(schemasScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(schemasScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(25, 25, 25)
-                                .addComponent(refreshSchemes)
-                                .addGap(18, 18, 18)
-                                .addComponent(newScheme)))
+                                .addGap(12, 12, 12)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(refreshSchemes)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(newScheme)))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -228,7 +234,7 @@ public class MainView extends javax.swing.JFrame {
                                 .addGap(18, 18, 18)
                                 .addComponent(jScrollPane1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                            .addGroup(layout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
                                 .addComponent(copyScheme)
                                 .addGap(26, 26, 26)
@@ -245,49 +251,48 @@ public class MainView extends javax.swing.JFrame {
                 .addGap(51, 51, 51)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(51, 51, 51))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(namespacesScroll, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
+                        .addComponent(namespacesScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(refreshNamespaces)
-                            .addComponent(refreshSchemes)
-                            .addComponent(newScheme))
-                        .addContainerGap())))
+                        .addComponent(refreshNamespaces)
+                        .addContainerGap(43, Short.MAX_VALUE))))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSeparator2))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jSeparator3)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel5)
-                                    .addComponent(schemaLabel))
-                                .addGap(6, 6, 6)
-                                .addComponent(jScrollPane1))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel1)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel4))
-                                .addGap(3, 3, 3)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel3)
-                                    .addComponent(namespaceLabel))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(schemasScroll)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jSeparator3, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel5)
+                            .addComponent(schemaLabel))
+                        .addGap(6, 6, 6)
+                        .addComponent(jScrollPane1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(exportScheme)
                             .addComponent(copyScheme)))
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.LEADING))
+                    .addComponent(jSeparator1)
+                    .addComponent(jSeparator2)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel4))
+                        .addGap(3, 3, 3)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3)
+                            .addComponent(namespaceLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(schemasScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(refreshSchemes)
+                            .addComponent(newScheme))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(statusLabel)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -310,7 +315,10 @@ public class MainView extends javax.swing.JFrame {
 
     private void newSchemeMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_newSchemeMouseReleased
         if (newScheme.isEnabled()) {
-
+            newScheme.setEnabled(false);
+            statusLabel.setText("Iniciando a inferência");
+            String namespace = namespaceLabel.getText();
+            app.newSchema(namespace);
         }
     }//GEN-LAST:event_newSchemeMouseReleased
 
@@ -325,13 +333,13 @@ public class MainView extends javax.swing.JFrame {
             fc.setCurrentDirectory(yourFolder); // start at application current directory
             fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             int returnVal = fc.showSaveDialog(this);
-            
+
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 yourFolder = fc.getSelectedFile();
             }
             BufferedWriter writer = null;
             try {
-                writer = new BufferedWriter(new FileWriter(yourFolder.getAbsolutePath()+"/"+schemaLabel.getText()+".json", true));
+                writer = new BufferedWriter(new FileWriter(yourFolder.getAbsolutePath() + "/" + schemaLabel.getText() + ".json", true));
                 writer.append(schemaArea.getText());
                 writer.close();
             } catch (IOException ex) {
@@ -364,6 +372,23 @@ public class MainView extends javax.swing.JFrame {
     private void copySchemeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copySchemeActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_copySchemeActionPerformed
+
+    public void updateStatus(String text) {
+        statusLabel.setText(text);
+    }
+
+    public void newSchema(Date date, long totalTime) {
+        
+        String dateF = String.format("%02d:%02d:%02d",
+                        TimeUnit.MILLISECONDS.toHours(totalTime),
+                        TimeUnit.MILLISECONDS.toMinutes(totalTime),
+                        TimeUnit.MILLISECONDS.toSeconds(totalTime));
+        updateStatus("Tempo de inferência: "+dateF);
+        selectNamespace();
+        AvaliableSchemes.setSelectedValue(date.toString(), true);
+        selectScheme();
+        newScheme.setEnabled(true);
+    }
 
     private void selectNamespace() {
         if (avaliableNamespaces.getSelectedIndex() >= 0) {
@@ -445,6 +470,7 @@ public class MainView extends javax.swing.JFrame {
         namespaceLabel.setText("");
         refreshSchemes.setEnabled(false);
         newScheme.setEnabled(false);
+        statusLabel.setText("");
         schemas = new String[0];
         clearSchemeView();
 
@@ -474,5 +500,6 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JTextArea schemaArea;
     private javax.swing.JLabel schemaLabel;
     private javax.swing.JScrollPane schemasScroll;
+    private javax.swing.JLabel statusLabel;
     // End of variables declaration//GEN-END:variables
 }

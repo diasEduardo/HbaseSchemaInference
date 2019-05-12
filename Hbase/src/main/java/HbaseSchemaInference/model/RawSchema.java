@@ -5,6 +5,7 @@
  */
 package HbaseSchemaInference.model;
 
+import HbaseSchemaInference.control.App;
 import HbaseSchemaInference.control.HbaseOperations;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -31,15 +32,17 @@ public class RawSchema {
 
     private String namespace, newNamespace;
     private final String rowName = "raw";
-    HbaseOperations ops;
+    private final HbaseOperations ops;
     private final int byteNum = 1, booleanNum = 2, stringNum = 4, shortNum = 8,
             charNum = 16, floatNum = 32, integerNum = 64, doubleNum = 1,
             longNum = 2, blobNum = 4;
+    private final App app;
 
-    public RawSchema(String namespace, HbaseOperations ops, String newNamespace) {
+    public RawSchema(String namespace, HbaseOperations ops, String newNamespace, App app) {
         this.namespace = namespace;
         this.ops = ops;
         this.newNamespace = newNamespace;
+        this.app = app;
     }
 
     public long getRawSchema() {
@@ -55,21 +58,27 @@ public class RawSchema {
         }
         ArrayList<PutData> data = new ArrayList<PutData>();
         String[] tables = ops.getTables(namespace);
+        int tableCount = 0;
+        String tableText = "";
         for (String table : tables) {
+            tableText = "Tabela: "+table+" ["+(tableCount++)+"/"+tables.length+"]";
             String[] families = ops.getFamilies(namespace, table);
             ops.createTable(newNamespace, table, families);
+            int familyCount = 0;
+            String familyText = "";
             for (String family : families) {
+                familyText = "Familia: "+family+" ["+(familyCount++)+"/"+families.length+"]";
                 byte[] fam = Bytes.toBytes(family);
                 String[] columns = ops.getColumns(namespace, table, family);
+                int columnCount = 0;
+                String columnText = "";
                 for (String column : columns) {
+                    columnText = "colunas: ["+(columnCount++)+"/"+columns.length+"]";
+                
                     byte[] col = Bytes.toBytes(column);
                     byte[] value = columnAnalysis(namespace, table, family, column);
                     //ops.putData(newNamespace, table, rowName, fam, col, value);
-                    int a = 0;
-                    if (a == 100) {
-                        a = 0;
-                    }
-                    a++;
+                    app.updateStatus("<html>"+tableText+"<br/>"+familyText+"<br/>"+columnText+"</html>");
                     data.add(new PutData(fam, col, value));
                 }
             }
