@@ -301,11 +301,13 @@ public class MainView extends javax.swing.JFrame {
 
     private void refreshNamespacesMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_refreshNamespacesMouseReleased
         getNamespaces();
+        statusLabel.setText("");
     }//GEN-LAST:event_refreshNamespacesMouseReleased
 
     private void refreshSchemesMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_refreshSchemesMouseReleased
         if (refreshSchemes.isEnabled()) {
             selectNamespace();
+            statusLabel.setText("");
         }
     }//GEN-LAST:event_refreshSchemesMouseReleased
 
