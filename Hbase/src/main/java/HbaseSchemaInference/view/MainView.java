@@ -75,6 +75,7 @@ public class MainView extends javax.swing.JFrame {
         jSeparator3 = new javax.swing.JSeparator();
         copyScheme = new javax.swing.JButton();
         statusLabel = new javax.swing.JLabel();
+        deleteScheme = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -177,6 +178,18 @@ public class MainView extends javax.swing.JFrame {
 
         statusLabel.setText("Status:");
 
+        deleteScheme.setText("Excluir");
+        deleteScheme.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                deleteSchemeMouseReleased(evt);
+            }
+        });
+        deleteScheme.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteSchemeActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -194,15 +207,8 @@ public class MainView extends javax.swing.JFrame {
                                 .addComponent(namespaceLabel))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(81, 81, 81)
-                                .addComponent(jLabel2)))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(173, 173, 173)
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(schemaLabel))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(207, 207, 207)
+                                .addComponent(jLabel2)
+                                .addGap(296, 296, 296)
                                 .addComponent(jLabel4)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
@@ -216,30 +222,40 @@ public class MainView extends javax.swing.JFrame {
                                 .addComponent(refreshNamespaces)
                                 .addGap(38, 38, 38)))
                         .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(schemasScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(12, 12, 12)
+                                .addGap(24, 24, 24)
+                                .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGroup(layout.createSequentialGroup()
+                                        .addGap(6, 6, 6)
                                         .addComponent(refreshSchemes)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(newScheme)))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(deleteScheme)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(newScheme))
+                                    .addComponent(schemasScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
                         .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addComponent(jScrollPane1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(copyScheme)
                                 .addGap(26, 26, 26)
                                 .addComponent(exportScheme)
-                                .addGap(94, 94, 94)))
+                                .addGap(94, 94, 94))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel5)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(schemaLabel)
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addComponent(jScrollPane1))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                         .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(22, 22, 22)))
                 .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -263,11 +279,12 @@ public class MainView extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jSeparator3, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
+                        .addComponent(jLabel4)
+                        .addGap(3, 3, 3)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel5)
                             .addComponent(schemaLabel))
-                        .addGap(6, 6, 6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -278,8 +295,7 @@ public class MainView extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel1)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel4))
+                            .addComponent(jLabel2))
                         .addGap(3, 3, 3)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3)
@@ -289,7 +305,8 @@ public class MainView extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(refreshSchemes)
-                            .addComponent(newScheme))
+                            .addComponent(newScheme)
+                            .addComponent(deleteScheme))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(statusLabel)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -375,6 +392,24 @@ public class MainView extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_copySchemeActionPerformed
 
+    private void deleteSchemeMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_deleteSchemeMouseReleased
+        if (deleteScheme.isEnabled()) {
+            if (AvaliableSchemes.getSelectedIndex() >= 0) {
+            String selected = schemas[AvaliableSchemes.getSelectedIndex()];
+            app.deleteScheme(selected);
+            selectNamespace();
+            statusLabel.setText("");
+        }else{
+            statusLabel.setText("selecione um esquema para excluir");
+            }
+            
+        } 
+    }//GEN-LAST:event_deleteSchemeMouseReleased
+
+    private void deleteSchemeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteSchemeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_deleteSchemeActionPerformed
+
     public void updateStatus(String text) {
         statusLabel.setText(text);
     }
@@ -435,6 +470,7 @@ public class MainView extends javax.swing.JFrame {
         AvaliableSchemes.setSelectedIndex(-1);
         schemasScroll.setViewportView(AvaliableSchemes);
         refreshSchemes.setEnabled(true);
+        deleteScheme.setEnabled(true);
         newScheme.setEnabled(true);
         clearSchemeView();
     }
@@ -471,6 +507,7 @@ public class MainView extends javax.swing.JFrame {
         schemasScroll.setViewportView(AvaliableSchemes);
         namespaceLabel.setText("");
         refreshSchemes.setEnabled(false);
+        deleteScheme.setEnabled(false);
         newScheme.setEnabled(false);
         statusLabel.setText("");
         schemas = new String[0];
@@ -483,6 +520,7 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JList<String> AvaliableSchemes;
     private javax.swing.JList<String> avaliableNamespaces;
     private javax.swing.JButton copyScheme;
+    private javax.swing.JButton deleteScheme;
     private javax.swing.JButton exportScheme;
     private javax.swing.Box.Filler filler1;
     private javax.swing.JLabel jLabel1;

@@ -26,6 +26,7 @@ import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
+import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
@@ -523,6 +524,27 @@ public class HbaseOperations {
         }
 
         return scanner;
+    }
+
+    public short deleteColumn(String namespace, String table, String row, String family, String column) {
+
+        TableName tableName = TableName.valueOf(namespace, table);
+
+        Table table2 = null;
+        try {
+            table2 = connection.getTable(tableName);
+        } catch (IOException ex) {
+
+            return -1;
+        }
+        Delete delete = new Delete(Bytes.toBytes(row));
+        delete.addColumn(Bytes.toBytes(family), Bytes.toBytes(column));
+        try {
+            table2.delete(delete);
+        } catch (IOException ex) {
+            return -2;
+        }
+        return 0;
     }
 
     /*

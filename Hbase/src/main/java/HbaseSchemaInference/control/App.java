@@ -5,48 +5,29 @@
  */
 package HbaseSchemaInference.control;
 
-import HbaseSchemaInference.control.HbaseOperations;
 import HbaseSchemaInference.model.RawSchema;
 import HbaseSchemaInference.view.MainView;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URLConnection;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
-import java.util.NavigableSet;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
-import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.ZooKeeperConnectionException;
 import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.Table;
-import org.apache.hadoop.hbase.client.metrics.ScanMetrics;
-import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
-import org.apache.hadoop.hbase.protobuf.generated.HBaseProtos;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.tika.Tika;
 
 /**
  *
@@ -109,6 +90,14 @@ public class App {
         view.updateStatus(text);
     }
 
+    public void deleteScheme(String selected) {
+        ops.deleteNamespace(selected);
+        String row = selected.split("_")[0];
+        ops.deleteColumn(manageNamespace[0], manageNamespace[1],row,manageNamespace[2],selected);
+    }
+
+/////////////////////////////////////////////////////////////////////////////////
+//Legacy 
     public static void scan_all(String table, Configuration conf) throws IOException {
         Connection connection = ConnectionFactory.createConnection();
         Table table2 = connection.getTable(TableName.valueOf(table));
