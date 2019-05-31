@@ -311,19 +311,6 @@ public class RawSchema {
                 + "      \"minLength\": 1,"
                 + "      \"minLength\": 1"
                 + "    },"
-                + "      \"string\": {"
-                + "      \"description\": \"Representation of a string\","
-                + "      \"type\": \"string\""
-                + "    },"
-                + "      "
-                + "      \"integer\": {"
-                + "      \"description\": \"Representation of a integer number\","
-                + "      \"type\": \"integer\""
-                + "    },  "
-                + "      \"boolean\": {"
-                + "      \"description\": \"Representation of a boolean\","
-                + "      \"type\": \"boolean\""
-                + "    },"
                 + "  },"
                 + ""
                 + "  \"$id\": \"namespace-" + namespace + "\","
@@ -369,12 +356,12 @@ public class RawSchema {
                             byte[] type = Arrays.copyOfRange(rowArray, family_cell.getValueOffset() + 5,
                                     family_cell.getValueOffset() + family_cell.getValueLength());
                             if ((type[1] & booleanNum) != 0) {
-                                types.add(ref + "boolean\"");
+                                types.add("\"type\": \"boolean\"");
                             } else if ((type[1] & byteNum) != 0) {
                                 types.add(ref + "byte\"");
                             }
                             if ((type[1] & stringNum) != 0) {
-                                types.add(ref + "string\"");
+                                types.add("\"type\": \"string\"");
                             }
                             if ((type[1] & shortNum) != 0) {
                                 types.add(ref + "short\"");
@@ -386,7 +373,7 @@ public class RawSchema {
                                 types.add(ref + "float\"");
                             }
                             if ((type[1] & integerNum) != 0) {
-                                types.add(ref + "integer\"");
+                                types.add("\"type\": \"integer\"");
                             }
                             if ((type[0] & doubleNum) != 0) {
                                 types.add(ref + "double\"");
